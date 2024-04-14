@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<local-project language="java" version="6.1.20514" xml-version="3" flavor="j2se">
+  <property name="parse-archive-in-archive" value="false" />
+  <property name="include-injected-dependency" value="false" />
+  <property name="relative-to" value="const(THIS_FILE)" />
+  <property name="action-set-mod" value="1" />
+  <property name="force-classpath" value="false" />
+  <property name="detail-mode" value="true" />
+  <property name="hide-deprecated" value="false" />
+  <property name="resolve-name-clashes" value="true" />
+  <property name="project-excluded" />
+  <property name="show-needs-to-compile" value="false" />
+  <property name="project-type" value="classpath" />
+  <property name="hide-externals" value="true" />
+  <classpath>
+    <classpathentry kind="lib" path="clientTest/build/classes/java/main" module="untitled8___clientTest___main" displaymodule="untitled8.clientTest.main" />
+    <classpathentry kind="lib" path="server/build/classes/java/main" module="untitled8___server___main" displaymodule="untitled8.server.main" />
+  </classpath>
+  <pom-root-files />
+  <modules>
+    <module name="untitled8___untitled" kind="ide-project" />
+    <module name="untitled8___server___main" kind="ide-project" />
+    <module name="untitled8___server" kind="ide-project" />
+    <module name="untitled8___clientTest___main" kind="ide-project" />
+    <module name="untitled8___clientTest" kind="ide-project" />
+    <module name="untitled8___client" kind="ide-project" />
+    <module name="untitled8" kind="ide-project" />
+    <module name="untitled8___server___test" kind="ide-project">
+      <requires name="untitled8___server___main" kind="ide-project" />
+    </module>
+    <module name="untitled8___clientTest___test" kind="ide-project">
+      <requires name="untitled8___clientTest___main" kind="ide-project" />
+    </module>
+  </modules>
+  <modules-in-scope>
+    <module name="untitled8___server___main" />
+    <module name="untitled8___server___test" />
+    <module name="untitled8___clientTest___main" />
+    <module name="untitled8___clientTest___test" />
+    <module name="untitled8___untitled" />
+    <module name="untitled8___server" />
+    <module name="untitled8___clientTest" />
+    <module name="untitled8___client" />
+    <module name="untitled8" />
+  </modules-in-scope>
+  <excludes>
+    <exclude expression="*.*&amp;amp;*" active="true" />
+  </excludes>
+  <restructuring>
+    <set version="3" name="Action list 1" hiview="Codemap" active="true" todo="false" list="0" />
+  </restructuring>
+  <grid-set sep="." version="6.1.20514" />
+</local-project>
