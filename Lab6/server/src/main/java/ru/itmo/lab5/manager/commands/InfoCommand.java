@@ -22,7 +22,7 @@ public class InfoCommand extends Command {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
         String answer ="";
-        answer = answer +"нформация о коллекции:\n";
+        answer = answer +"информация о коллекции:\n";
         answer = answer +"Тип коллекции: " + ticketCollection.getTickets().getClass().getName()+"\n";
         answer = answer +"Количество элементов: " + ticketCollection.getTickets().size()+"\n";
         if (ticketCollection.getInitializationDate() != null) {

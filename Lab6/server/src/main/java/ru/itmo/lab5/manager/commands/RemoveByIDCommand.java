@@ -19,7 +19,7 @@ public class RemoveByIDCommand extends Command {
     @Override
     public Task execute(Task task) {
         if (task.describe[1].isEmpty()) {
-            return new Task(new String[]{"спользование: '" + getName() + "'"});
+            return new Task(new String[]{"использование: '" + getName() + "'"});
         }
         long id;
         try {

@@ -20,7 +20,4 @@ public abstract class Command {
         return name;
     }
 
-    public String getDescription() {
-        return description;
-    }
 }

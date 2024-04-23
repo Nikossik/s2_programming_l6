@@ -19,14 +19,14 @@ public class RemoveAtCommand extends Command {
     @Override
     public Task execute(Task task) {
         if (task.describe.length < 2 || task.describe[1].isEmpty()) {
-            return new Task(new String[]{"Необходимо указать индекс элемента для удаления. спользование: remove_at <index>"});
+            return new Task(new String[]{"Необходимо указать индекс элемента для удаления. использование: remove_at <index>"});
         }
 
         int index;
         try {
             index = Integer.parseInt(task.describe[1]);
         } catch (NumberFormatException e) {
-            return new Task(new String[]{"ндекс должен быть целым числом. Передано неверное значение: " + task.describe[1]});
+            return new Task(new String[]{"индекс должен быть целым числом. Передано неверное значение: " + task.describe[1]});
         }
 
         try {
@@ -36,7 +36,7 @@ public class RemoveAtCommand extends Command {
                 return new Task(new String[]{"Элемент с таким индексом не найден."});
             }
         } catch (IndexOutOfBoundsException e) {
-            return new Task(new String[]{"ндекс выходит за пределы коллекции. Передано неверное значение: " + index});
+            return new Task(new String[]{"индекс выходит за пределы коллекции. Передано неверное значение: " + index});
         }
     }
 }

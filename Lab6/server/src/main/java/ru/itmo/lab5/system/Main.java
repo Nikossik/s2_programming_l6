@@ -8,8 +8,8 @@ import ru.itmo.lab5.network.Server;
 import sun.misc.Signal;
 
 import java.io.IOException;
-import java.net.SocketException;
-import java.sql.SQLException;
+
+
 
 public class Main {
     private static void setSignalProcessing(String... signalNames) {
@@ -17,17 +17,13 @@ public class Main {
             try {
                 Signal.handle(new Signal(signalName), signal -> System.out.print("\nДля получения справки введите 'help', для завершения программы введите 'exit'\n"));
             } catch (IllegalArgumentException ignored) {
-                // гнорируем исключение, если сигнал с таким названием уже существует или такого сигнала не существует
+                // Игнорируем исключение, если сигнал с таким названием уже существует или такого сигнала не существует
             }
         }
     }
 
     public static void main(String[] args) {
         String filePath = "data/file.xml";
-        if (filePath == null || filePath.isEmpty()) {
-            System.err.println("Переменная среды 'TICKETS_FILE_PATH' не задана или пуста.");
-            return; // Завершаем работу приложения, если путь не задан
-        }
 
         new Thread(() ->{
             try {
@@ -38,8 +34,6 @@ public class Main {
                 CommandInvoker commandInvoker = new CommandInvoker(ticketCollection, dumpManager);
                 Server server= new Server(new Console(commandInvoker));
                 server.runServer();
-            } catch (SocketException e) {
-                throw new RuntimeException(e);
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }

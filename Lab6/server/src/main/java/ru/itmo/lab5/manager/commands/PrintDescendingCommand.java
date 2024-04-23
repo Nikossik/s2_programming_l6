@@ -25,7 +25,7 @@ public class PrintDescendingCommand extends Command {
         } else {
             ticketCollection.getTickets().stream()
                     .sorted(Comparator.comparing(Ticket::getPrice).reversed())
-                    .forEach(ticket -> System.out.println(ticket));
+                    .forEach(System.out::println);
             return new Task(new String[]{"Элементы коллекции выведены в порядке убывания."});
         }
     }

@@ -6,10 +6,10 @@ import java.io.*;
 import java.net.*;
 
 public class Client {
-    private DatagramSocket socket= new DatagramSocket();
-    private InetAddress address= InetAddress.getByName("localhost");
-    private byte[] buffer = new byte[4096];
-    private DatagramPacket packet= new DatagramPacket(buffer, buffer.length);
+    private final DatagramSocket socket= new DatagramSocket();
+    private final InetAddress address= InetAddress.getByName("localhost");
+    private final byte[] buffer = new byte[4096];
+    private final DatagramPacket packet= new DatagramPacket(buffer, buffer.length);
 
     public Client() throws SocketException, UnknownHostException {
     }

@@ -74,7 +74,7 @@ public class TicketCollection {
     /**
      * Проверяет наличие билета с указанным ID в коллекции.
      *
-     * @param id дентификатор билета для поиска.
+     * @param id идентификатор билета для поиска.
      * @return true, если билет с таким ID присутствует в коллекции, иначе false.
      */
     public boolean contains(int id) {
@@ -123,8 +123,7 @@ public class TicketCollection {
     * Обновляет билет в коллекции, заменяя его на предоставленный билет с тем же ID.
     *
     * @param newTicket Билет с обновленной информацией.
-    * @return true, если билет был успешно обновлен, иначе false.
-    */
+     */
     public void update(Ticket newTicket) {
         for (int i = 0; i < tickets.size(); i++) {
             if (tickets.get(i).getId() == newTicket.getId()) {
@@ -137,7 +136,7 @@ public class TicketCollection {
     /**
      * Удаляет билет с указанным ID из коллекции.
      *
-     * @param id дентификатор билета для удаления.
+     * @param id идентификатор билета для удаления.
      * @return true, если билет был найден и удален, иначе false.
      */
     public boolean remove(long id) {
@@ -157,7 +156,7 @@ public class TicketCollection {
     /**
      * Удаляет билет из коллекции, расположенный на указанной позиции.
      *
-     * @param index ндекс билета для удаления.
+     * @param index индекс билета для удаления.
      * @return true, если билет на заданной позиции был успешно удален, иначе false.
      */
     public boolean removeAt(int index) {

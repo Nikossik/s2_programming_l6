@@ -6,30 +6,24 @@ import ru.itmo.lab5.util.Task;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 public class CommandInvoker {
     private final Map<String, Command> commandMap = new HashMap<>();
-    private final Scanner scanner = new Scanner(System.in);
-    private final TicketCollection ticketCollection;
-    private final DumpManager dumpManager;
 
     /**
      * Конструктор класса CommandInvoker.
-     * нициализирует новый экземпляр класса с заданной коллекцией билетов и менеджером дампа.
+     * Инициализирует новый экземпляр класса с заданной коллекцией билетов и менеджером дампа.
      *
      * @param ticketCollection Коллекция билетов для управления.
      * @param dumpManager Менеджер для работы с файлами сохранения/загрузки коллекции.
      */
     public CommandInvoker(TicketCollection ticketCollection, DumpManager dumpManager) {
-        this.ticketCollection = ticketCollection;
-        this.dumpManager = dumpManager;
 
-        register("help", new HelpCommand(ticketCollection, this));
+        register("help", new HelpCommand(ticketCollection));
         register("info", new InfoCommand(ticketCollection));
         register("show", new ShowCommand(ticketCollection));
         register("add", new AddCommand(ticketCollection));
-        register("update_id", new UpdateIDCommand(ticketCollection, scanner));
+        register("update_id", new UpdateIDCommand(ticketCollection));
         register("remove_by_id", new RemoveByIDCommand(ticketCollection));
         register("clear", new ClearCommand(ticketCollection));
         register("save", new SaveCommand(ticketCollection, dumpManager));
@@ -42,7 +36,7 @@ public class CommandInvoker {
     }
 
     /**
-     * Регистрирует новую команду в инвокере.
+     * Регистрирует новую команду в иинвокере.
      *
      * @param commandName мя команды.
      * @param command Объект команды.

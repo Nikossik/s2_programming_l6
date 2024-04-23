@@ -19,7 +19,7 @@ public class FilterLessThanVenueCommand extends Command {
     @Override
     public Task execute(Task task) {
         if (task.describe.length < 2 || task.describe[1].isEmpty()) {
-            new Task(new String[]{"Необходимо указать значение для сравнения. спользование: '" + getName() + "'"});
+            new Task(new String[]{"Необходимо указать значение для сравнения. использование: '" + getName() + "'"});
         }
 
         int venueCapacity;
@@ -31,7 +31,7 @@ public class FilterLessThanVenueCommand extends Command {
 
         ticketCollection.getTickets().stream()
                 .filter(ticket -> ticket.getVenue() != null && ticket.getVenue().getCapacity() < venueCapacity)
-                .forEach(ticket -> System.out.println(ticket));
+                .forEach(System.out::println);
         return new Task(new String[]{"Ошибка"});
     }
 }

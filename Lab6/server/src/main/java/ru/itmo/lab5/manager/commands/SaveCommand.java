@@ -23,6 +23,6 @@ public class SaveCommand extends Command {
     @Override
     public Task execute(Task task) {
         dumpManager.writeCollection(ticketCollection);
-        return new Task(new String[]{"Save"});
+        return new Task(new String[]{"Коллекция сохранена"});
     }
 }

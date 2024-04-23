@@ -6,7 +6,7 @@ import ru.itmo.lab5.util.Task;
 
 
 import java.util.Optional;
-import java.util.Scanner;
+
 /**
  * Команда для обновления элемента коллекции с указанным ID.
  */
@@ -15,16 +15,15 @@ public class UpdateIDCommand extends Command {
      * Конструктор команды update_id.
      *
      * @param ticketCollection Коллекция билетов, с которой работает команда.
-     * @param scanner          Сканер для ввода данных пользователем.
      */
-    public UpdateIDCommand(TicketCollection ticketCollection, Scanner scanner) {
+    public UpdateIDCommand(TicketCollection ticketCollection) {
         super("update_id <id>", "Обновляет значение элемента коллекции, ID которого равен заданному", ticketCollection);
     }
 
     @Override
     public Task execute(Task task) {
         if (task.describe[1].isEmpty()) {
-            return new Task(new String[]{"спользование: '" + getName() + "'"});
+            return new Task(new String[]{"использование: '" + getName() + "'"});
         }
         long id;
         try {

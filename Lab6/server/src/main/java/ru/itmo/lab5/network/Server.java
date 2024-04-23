@@ -71,7 +71,7 @@ public class Server {
         });
     }
 
-    public void processTask() throws IOException, InterruptedException {
+    public void processTask() throws InterruptedException {
         Task task = blockingQueueTask.take();
         System.out.println(task.describe[0]);
         logger.log(Level.INFO, "Выполнение команды");

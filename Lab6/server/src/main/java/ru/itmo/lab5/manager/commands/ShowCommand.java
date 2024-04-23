@@ -22,12 +22,12 @@ public class ShowCommand extends Command {
         if (ticketCollection.getTickets().isEmpty()) {
             return new Task(new String[]{"Коллекция пуста."});
         } else {
-            String answer = "";
-            answer = answer+ "Элементы коллекции:\n";
+            StringBuilder answer = new StringBuilder();
+            answer.append("Элементы коллекции:\n");
             for (Ticket ticket : ticketCollection.getTickets()) {
-                answer=answer+ticket+"\n";
+                answer.append(ticket).append("\n");
             }
-            return new Task(new String[]{answer});
+            return new Task(new String[]{answer.toString()});
         }
     }
 }

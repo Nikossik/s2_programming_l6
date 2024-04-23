@@ -16,38 +16,37 @@ dependencies {
     implementation('com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.2')
     implementation('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2')
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    implementation('org.postgresql:postgresql:42.3.8')
     implementation('jakarta.xml.bind:jakarta.xml.bind-api:4.0.1')
     implementation('org.glassfish.jaxb:jaxb-runtime:4.0.4')
     implementation('jakarta.activation:jakarta.activation-api:2.1.3')
 }
 
-task testing {
+tasks.register('testing') {
     doLast {
         println 'Running tests...'
     }
 }
-task application {
+tasks.register('application') {
     // Define the main class for the application.
-    mainClassName = 'ru.lab5.itmo.system.Main'
+    mainClassName = 'ru.itmo.lab5.system.Main'
 }
 
 run {
-    main = 'ru.lab5.itmo.system.Main'
+    main = 'ru.itmo.lab5.system.Main'
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
-    environment 'Lab', 'C:/origin.xml'
+    environment 'Lab', 'data/file.xml'
 }
 shadowJar {
 
-    setMainClassName('ru.lab5.itmo.system.Main')
-    archiveBaseName.set('C/Lab6')
+    setMainClassName('ru.itmo.lab5.system.Main')
+    archiveBaseName.set('Jar/Lab6')
     configurations = [project.configurations.compileClasspath]
     manifest {
-        attributes 'Main-Class': 'ru.lab5.itmo.system.Main'
+        attributes 'Main-Class': 'ru.itmo.lab5.system.Main'
     }
 }
-task ShadowJar{
-    setMainClassName('ru.lab5.itmo.system.Main')
+tasks.register('ShadowJar') {
+    setMainClassName('ru.itmo.lab5.system.Main')
 }
 

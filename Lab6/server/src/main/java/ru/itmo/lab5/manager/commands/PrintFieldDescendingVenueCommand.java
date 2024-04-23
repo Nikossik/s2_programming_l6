@@ -1,6 +1,8 @@
 package ru.itmo.lab5.manager.commands;
 
 import ru.itmo.lab5.data.TicketCollection;
+import ru.itmo.lab5.data.models.Ticket;
+import ru.itmo.lab5.data.models.Venue;
 import ru.itmo.lab5.util.Task;
 
 import java.util.Comparator;
@@ -21,19 +23,17 @@ public class PrintFieldDescendingVenueCommand extends Command {
     }
     /**
      * Выполняет операцию вывода информации о местах проведения всех билетов в порядке убывания вместимости.
-     * спользует Java Stream API для фильтрации ненулевых значений venue, сортировки их по убыванию вместимости и
+     * Использует Java Stream API для фильтрации ненулевых значений venue, сортировки их по убыванию вместимости и
      * вывода результата. Результат выводится в стандартный поток вывода.
-     *
-     * @param args Аргументы команды (не используются в этой команде).
      */
     @Override
     public Task execute(Task task) {
         // Фильтруем ненулевые venue, сортируем по убыванию capacity и выводим результат
         String venues = ticketCollection.getTickets().stream()
-                .map(ticket -> ticket.getVenue()) // Получаем Venue из каждого Ticket
-                .filter(Objects::nonNull) // сключаем null значения
+                .map(Ticket::getVenue) // Получаем Venue из каждого Ticket
+                .filter(Objects::nonNull) // исключаем null значения
                 .sorted(Comparator.comparingInt(venue -> -venue.getCapacity())) // Сортируем по убыванию capacity
-                .map(venue -> venue.toString()) // Преобразуем Venue в строку для вывода
+                .map(Venue::toString) // Преобразуем Venue в строку для вывода
                 .collect(Collectors.joining("\n")); // Собираем результаты в одну строку, разделяя их новой строкой
 
         if (venues.isEmpty()) {
