@@ -3,7 +3,6 @@ package ru.itmo.lab5.util;
 import ru.itmo.lab5.data.models.Ticket;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class Task implements Serializable {
     public String[] describe;
