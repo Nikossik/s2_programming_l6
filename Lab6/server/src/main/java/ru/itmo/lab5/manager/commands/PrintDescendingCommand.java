@@ -23,10 +23,15 @@ public class PrintDescendingCommand extends Command {
         if (ticketCollection.getTickets().isEmpty()) {
             return new Task(new String[]{"Коллекция пуста."});
         } else {
+            StringBuilder answer = new StringBuilder();
+            answer.append("Коллекция выведена в порядке убывания:\n");
             ticketCollection.getTickets().stream()
                     .sorted(Comparator.comparing(Ticket::getPrice).reversed())
                     .forEach(System.out::println);
-            return new Task(new String[]{"Элементы коллекции выведены в порядке убывания."});
+            for (Ticket ticket : ticketCollection.getTickets()) {
+                answer.append(ticket).append("\n");
+            }
+            return new Task(new String[]{answer.toString()});
         }
     }
 }

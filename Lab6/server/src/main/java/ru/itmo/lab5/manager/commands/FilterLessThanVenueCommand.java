@@ -1,6 +1,7 @@
 package ru.itmo.lab5.manager.commands;
 
 import ru.itmo.lab5.data.TicketCollection;
+import ru.itmo.lab5.data.models.Ticket;
 import ru.itmo.lab5.util.Task;
 
 /**
@@ -28,10 +29,15 @@ public class FilterLessThanVenueCommand extends Command {
         } catch (NumberFormatException e) {
             return new Task(new String[]{"Значение должно быть целым числом. Передано неверное значение: " + task.describe[1]});
         }
-
+        StringBuilder answer = new StringBuilder();
+        answer.append("Отсортированные элементы коллекции:\n");
         ticketCollection.getTickets().stream()
                 .filter(ticket -> ticket.getVenue() != null && ticket.getVenue().getCapacity() < venueCapacity)
                 .forEach(System.out::println);
-        return new Task(new String[]{"Ошибка"});
+
+        for (Ticket ticket : ticketCollection.getTickets()) {
+            answer.append(ticket).append("\n");
+        }
+        return new Task(new String[]{answer.toString()});
     }
 }
