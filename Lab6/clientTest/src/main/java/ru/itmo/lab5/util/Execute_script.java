@@ -9,12 +9,12 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class Execute_script {
-    private ArrayList<String> listOfPaths= new ArrayList<>();
+    private final ArrayList<String> listOfPaths= new ArrayList<>();
 
-    public void readScript(String path, Client client, TicketBuilder ticketBuilder) throws IOException, ClassNotFoundException {
+    public void readScript(String path, Client client, TicketBuilder ticketBuilder) throws IOException {
         FileReader fileReader= new FileReader(path);
         if (!fileReader.ready()){
-            System.out.println("Что то непраильно с файлом");
+            System.out.println("Что то неправильно с файлом");
         }
         else {
             Scanner scanner = new Scanner(fileReader);
@@ -42,7 +42,8 @@ public class Execute_script {
                     }
                 }
             }
-            catch (Exception e){
+            catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
     }

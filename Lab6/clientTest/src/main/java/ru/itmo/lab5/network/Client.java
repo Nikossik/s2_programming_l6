@@ -19,7 +19,7 @@ public class Client {
         ObjectOutputStream objectOutputStream= new ObjectOutputStream(byteArrayOutputStream);
         objectOutputStream.writeObject(task);
         byte[] buffer = byteArrayOutputStream.toByteArray();
-        DatagramPacket packet= new DatagramPacket(buffer, buffer.length, address, 8000);
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, 8000);
         socket.send(packet);
         getAnswer();
     }
