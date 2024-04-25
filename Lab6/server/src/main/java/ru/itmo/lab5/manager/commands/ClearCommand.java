@@ -20,10 +20,9 @@ public class ClearCommand extends Command {
     public Task execute(Task task) {
         if (ticketCollection != null && !ticketCollection.getTickets().isEmpty()) {
             ticketCollection.getTickets().clear();
-            new Task(new String[]{"Коллекция успешно очищена."});
+            return new Task(new String[]{"Коллекция успешно очищена."});
         } else {
             return new Task(new String[]{"Коллекция уже пуста или не инициализирована."});
         }
-        return new Task(new String[]{"Ошибка"});
     }
 }
