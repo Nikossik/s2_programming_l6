@@ -5,6 +5,8 @@ import ru.itmo.lab5.util.Task;
 
 import java.io.*;
 import java.net.*;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -22,30 +24,31 @@ public class Server {
     private final ExecutorService fixedThreadPoolAnswer = Executors.newFixedThreadPool(10);
     private final LinkedBlockingQueue<Task> blockingQueueTask = new LinkedBlockingQueue<>();
     private final LinkedBlockingQueue<Task> blockingQueueAnswer = new LinkedBlockingQueue<>();
+    private final Map<String, Map<Integer, byte[]>> sessionData = new ConcurrentHashMap<>();
+    private final Map<String, Integer> sessionTotalPackets = new ConcurrentHashMap<>();
     private final byte[] buffer = new byte[4096];
     private final DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
     public Server() throws SocketException, UnknownHostException {
 
     }
 
+
     public Server(Console console) throws SocketException, UnknownHostException {
         this.console = console;
     }
 
-    public void runServer() throws IOException, ClassNotFoundException {
-
+    public void runServer() throws IOException {
         fixedThreadPoolTask.submit(() -> {
             try {
                 while (true) {
                     logger.log(Level.INFO, "Получение информации");
+                    byte[] buffer = new byte[4096];
+                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                     socket.receive(packet);
-                    byte[] data = packet.getData();
-                    ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(data));
-                    Task task = (Task) objectInputStream.readObject();
-                    blockingQueueTask.put(task);
+                    processPacket(packet);
                 }
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Ошибка при получении задачи: " + e.getMessage());
+                logger.log(Level.SEVERE, "Ошибка при получении пакетов: " + e.getMessage());
             }
         });
 
@@ -63,7 +66,7 @@ public class Server {
             try {
                 while (true) {
                     Task answer = blockingQueueAnswer.take();
-                    sendAnswer(address, packet.getPort(), answer);
+                    sendAnswer(address, 8000, answer);
                 }
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Ошибка при отправке ответа: " + e.getMessage());
@@ -73,18 +76,49 @@ public class Server {
 
     public void processTask() throws InterruptedException {
         Task task = blockingQueueTask.take();
-        System.out.println(task.describe[0]);
         logger.log(Level.INFO, "Выполнение команды");
         blockingQueueAnswer.put(console.start(task));
     }
 
-    public void sendAnswer(InetAddress address, int port, Task answer) throws IOException {
-        logger.log(Level.INFO, "Отправка ответа");
+    private void processPacket(DatagramPacket packet) throws IOException {
+        ByteArrayInputStream bais = new ByteArrayInputStream(packet.getData(), packet.getOffset(), packet.getLength());
+        DataInputStream dis = new DataInputStream(bais);
+        int packetId = dis.readInt();
+        int totalPackets = dis.readInt();
+        byte[] data = new byte[dis.available()];
+        dis.readFully(data);
+
+        String sessionId = packet.getAddress().toString() + ":" + packet.getPort();
+        sessionTotalPackets.put(sessionId, totalPackets);
+
+        Map<Integer, byte[]> packets = sessionData.computeIfAbsent(sessionId, k -> new ConcurrentHashMap<>());
+        packets.put(packetId, data);
+
+        if (packets.size() == totalPackets) assembleData(sessionId, packets, totalPackets);
+    }
+
+    private void assembleData(String sessionId, Map<Integer, byte[]> packets, int totalPackets) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        for (int i = 0; i < totalPackets; i++) {
+            baos.write(packets.get(i));
+        }
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        try {
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            Task task = (Task) ois.readObject();
+            blockingQueueTask.put(task);
+        } catch (ClassNotFoundException | InterruptedException e) {
+            logger.log(Level.SEVERE, "Ошибка при десериализации задачи: " + e.getMessage());
+        }
+    }
+
+
+    private void sendAnswer(InetAddress address, int port, Task answer) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
         objectOutputStream.writeObject(answer);
-        byte[] buffer = byteArrayOutputStream.toByteArray();
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, port);
-        socket.send(packet);
+        byte[] sendBuffer = byteArrayOutputStream.toByteArray();
+        DatagramPacket responsePacket = new DatagramPacket(sendBuffer, sendBuffer.length, address, port);
+        socket.send(responsePacket);
     }
 }

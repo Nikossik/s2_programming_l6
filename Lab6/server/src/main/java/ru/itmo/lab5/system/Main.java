@@ -23,7 +23,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        String filePath = "data/file.xml";
+        String filePath = "Lab6/data/file.xml";
 
         new Thread(() ->{
             try {
@@ -34,7 +34,7 @@ public class Main {
                 CommandInvoker commandInvoker = new CommandInvoker(ticketCollection, dumpManager);
                 Server server= new Server(new Console(commandInvoker));
                 server.runServer();
-            } catch (IOException | ClassNotFoundException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }).start();
