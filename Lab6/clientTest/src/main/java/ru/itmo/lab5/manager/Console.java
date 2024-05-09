@@ -56,9 +56,7 @@ public class Console {
                     }
                 } catch (NoSuchElementException e) {
                     System.out.println("Команда '" + input + "' не найдена. Введите 'help' для помощи");
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } catch (ClassNotFoundException e) {
+                } catch (IOException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 }
             }

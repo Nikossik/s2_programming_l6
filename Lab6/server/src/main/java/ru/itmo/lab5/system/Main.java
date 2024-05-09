@@ -17,7 +17,7 @@ public class Main {
             try {
                 Signal.handle(new Signal(signalName), signal -> System.out.print("\nДля получения справки введите 'help', для завершения программы введите 'exit'\n"));
             } catch (IllegalArgumentException ignored) {
-                // Игнорируем исключение, если сигнал с таким названием уже существует или такого сигнала не существует
+                // гнорируем исключение, если сигнал с таким названием уже существует или такого сигнала не существует
             }
         }
     }
@@ -32,7 +32,7 @@ public class Main {
                 TicketCollection ticketCollection = new TicketCollection(dumpManager);
 
                 CommandInvoker commandInvoker = new CommandInvoker(ticketCollection, dumpManager);
-                Server server= new Server(new Console(commandInvoker));
+                Server server= new Server(new Console(commandInvoker), 8000);
                 server.runServer();
             } catch (IOException e) {
                 throw new RuntimeException(e);

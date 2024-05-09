@@ -1,57 +1,70 @@
 package ru.itmo.lab5.network;
 
 import ru.itmo.lab5.util.Task;
-
+import java.util.Arrays;
 import java.io.*;
 import java.net.*;
 
 public class Client {
-    private final DatagramSocket socket= new DatagramSocket();
-    private final InetAddress address= InetAddress.getByName("localhost");
-    private final byte[] buffer = new byte[4096];
-    private static final int BUFFER_SIZE = 4096;
-    private final DatagramPacket packet= new DatagramPacket(buffer, buffer.length);
+    private final int BUFFER_SIZE = 4096;
+    DatagramSocket socket = new DatagramSocket();
+    InetAddress address = InetAddress.getByName("localhost");
 
     public Client() throws SocketException, UnknownHostException {
+
     }
 
     public void sendTask(Task task) throws IOException, ClassNotFoundException {
+        byte[] fullData = serializeTask(task);
+        sendData(fullData);
+        Task response = getAnswer();
+        System.out.println("Полученный ответ: " + response.describe[0]);
+    }
+
+    private byte[] serializeTask(Task task) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
         objectOutputStream.writeObject(task);
-        objectOutputStream.flush();
-        byte[] fullData = byteArrayOutputStream.toByteArray();
-        int totalPackets = (int) Math.ceil(fullData.length / (double) BUFFER_SIZE);
-
-        for (int i = 0; i < totalPackets; i++) {
-            int start = i * BUFFER_SIZE;
-            int length = Math.min(BUFFER_SIZE, fullData.length - start);
-            byte[] buffer = new byte[length];
-            System.arraycopy(fullData, start, buffer, 0, length);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            DataOutputStream dos = new DataOutputStream(baos);
-            dos.writeInt(i);
-            dos.writeInt(totalPackets);
-            dos.write(buffer);
-
-            byte[] packetData = baos.toByteArray();
-            DatagramPacket packet = new DatagramPacket(packetData, packetData.length, address, 8000);
-            socket.send(packet);
-        }
-        getAnswer();
+        return byteArrayOutputStream.toByteArray();
     }
 
-    public void getAnswer() throws IOException, ClassNotFoundException, SocketTimeoutException {
+
+    private void sendData(byte[] data) throws IOException {
+        int DATA_SIZE = BUFFER_SIZE - 1;
+        int totalPackets = (int)Math.ceil(data.length / (double) DATA_SIZE);
+        byte[][] packets = new byte[totalPackets][DATA_SIZE + 1]; // +1 для флага в конце
+
+        int start = 0;
+        for (int i = 0; i < totalPackets; i++) {
+            int end = Math.min(start + DATA_SIZE, data.length);
+            packets[i] = Arrays.copyOfRange(data, start, end);
+            start += DATA_SIZE;
+
+            byte flag = (byte) (i == totalPackets - 1 ? 1 : 0);
+            packets[i] = Arrays.copyOf(packets[i], packets[i].length + 1);
+            packets[i][packets[i].length - 1] = flag;
+
+
+            int serverPort = 1488;
+            DatagramPacket packet = new DatagramPacket(packets[i], packets[i].length, address, serverPort);
+            socket.send(packet);
+        }
+    }
+
+    public Task getAnswer() throws IOException, ClassNotFoundException {
         try {
-            socket.setSoTimeout(5000);
+            socket.setSoTimeout(10000);
+            byte[] buffer = new byte[BUFFER_SIZE];
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+
             socket.receive(packet);
-            byte[] data = packet.getData();
-            ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(data));
-            Task answer = (Task) objectInputStream.readObject();
-            System.out.println(answer.describe[0]);
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(packet.getData(), 0, packet.getLength());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            return (Task) ois.readObject();
         } catch (SocketTimeoutException e) {
             System.out.println("Сервер не доступен. Пожалуйста, попробуйте позже.");
-        } catch (IOException e) {
-            System.out.println("Произошла ошибка ввода/вывода: " + e.getMessage());
         }
-    }   }
+        return null;
+    }
+}

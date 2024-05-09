@@ -7,14 +7,14 @@ import java.util.NoSuchElementException;
 public class Console {
 
     /**
-     * Инвокер команд для выполнения операций над коллекцией билетов.
+     * нвокер команд для выполнения операций над коллекцией билетов.
      */
     private final CommandInvoker commandInvoker;
 
     /**
      * Конструктор, инициализирующий Console с заданным инвокером команд.
      *
-     * @param commandInvoker Инвокер команд, который будет использоваться для обработки вводимых команд.
+     * @param commandInvoker нвокер команд, который будет использоваться для обработки вводимых команд.
      */
     public Console(CommandInvoker commandInvoker) {
         this.commandInvoker = commandInvoker;
