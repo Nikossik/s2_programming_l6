@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PID=$(lsof -ti:8000)
+PID=$(lsof -ti:1488)
 
 if [ -z "$PID" ]; then
   echo "На порту нет активных процессов."

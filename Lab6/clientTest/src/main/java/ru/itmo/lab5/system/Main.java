@@ -4,6 +4,7 @@ import ru.itmo.lab5.manager.Console;
 import ru.itmo.lab5.network.Client;
 import sun.misc.Signal;
 
+import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
@@ -17,7 +18,7 @@ public class Main {
         }
     }
 
-    public static void main(String[] args) throws SocketException, UnknownHostException {
+    public static void main(String[] args) throws IOException {
         Console console = new Console(new Client());
 
         console.start();

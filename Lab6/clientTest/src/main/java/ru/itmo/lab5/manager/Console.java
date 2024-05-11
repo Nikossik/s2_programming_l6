@@ -18,7 +18,7 @@ public class Console {
     private final Scanner scanner;
     private final Client client;
 
-    public Console(Client client) throws SocketException, UnknownHostException {
+    public Console(Client client) throws IOException {
         this.scanner = new Scanner(System.in);
         this.client =  new Client();
     }

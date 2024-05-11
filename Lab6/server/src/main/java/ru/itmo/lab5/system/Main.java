@@ -32,7 +32,7 @@ public class Main {
                 TicketCollection ticketCollection = new TicketCollection(dumpManager);
 
                 CommandInvoker commandInvoker = new CommandInvoker(ticketCollection, dumpManager);
-                Server server= new Server(new Console(commandInvoker), 8000);
+                Server server= new Server(new Console(commandInvoker));
                 server.runServer();
             } catch (IOException e) {
                 throw new RuntimeException(e);
