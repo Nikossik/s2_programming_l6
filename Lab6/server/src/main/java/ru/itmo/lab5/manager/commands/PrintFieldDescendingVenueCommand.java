@@ -23,18 +23,17 @@ public class PrintFieldDescendingVenueCommand extends Command {
     }
     /**
      * Выполняет операцию вывода информации о местах проведения всех билетов в порядке убывания вместимости.
-     * Использует Java Stream API для фильтрации ненулевых значений venue, сортировки их по убыванию вместимости и
+     * спользует Java Stream API для фильтрации ненулевых значений venue, сортировки их по убыванию вместимости и
      * вывода результата. Результат выводится в стандартный поток вывода.
      */
     @Override
     public Task execute(Task task) {
-        // Фильтруем ненулевые venue, сортируем по убыванию capacity и выводим результат
         String venues = ticketCollection.getTickets().stream()
-                .map(Ticket::getVenue) // Получаем Venue из каждого Ticket
-                .filter(Objects::nonNull) // исключаем null значения
-                .sorted(Comparator.comparingInt(venue -> -venue.getCapacity())) // Сортируем по убыванию capacity
-                .map(Venue::toString) // Преобразуем Venue в строку для вывода
-                .collect(Collectors.joining("\n")); // Собираем результаты в одну строку, разделяя их новой строкой
+                .map(Ticket::getVenue)
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingInt(venue -> -venue.getCapacity()))
+                .map(Venue::toString)
+                .collect(Collectors.joining("\n"));
 
         if (venues.isEmpty()) {
             return new Task(new String[]{"В коллекции нет элементов с заданным полем venue или коллекция пуста."});

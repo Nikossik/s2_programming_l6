@@ -76,4 +76,6 @@
             </address>
         </venue>
     </ticket>
+    <initializationDate/>
+    <lastSaveTime/>
 </ticketCollection>

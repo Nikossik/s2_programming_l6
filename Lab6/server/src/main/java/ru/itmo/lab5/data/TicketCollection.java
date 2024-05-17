@@ -9,52 +9,47 @@ import ru.itmo.lab5.manager.DumpManager;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-
-
-
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @XmlRootElement(name = "ticketCollection")
 @XmlAccessorType(XmlAccessType.FIELD)
-
-
 public class TicketCollection {
     @XmlElement(name = "ticket")
     private final ArrayList<Ticket> tickets;
-    @XmlTransient
     private final LocalDateTime initializationDate;
-    @XmlTransient
     private LocalDateTime lastSaveTime;
     @XmlTransient
     private DumpManager dumpManager;
 
+    @XmlTransient
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    @XmlTransient
+    private final Lock readLock = lock.readLock();
+    @XmlTransient
+    private final Lock writeLock = lock.writeLock();
+
     public TicketCollection() {
         this.tickets = new ArrayList<>();
-        this.initializationDate = LocalDateTime.now(); // Устанавливаем текущую дату инициализации
+        this.initializationDate = LocalDateTime.now();
         lastSaveTime = LocalDateTime.now();
     }
 
-    /**
-     * Конструктор, создающий коллекцию билетов и загружающий её содержимое из файла, используя указанный DumpManager.
-     * После загрузки коллекции обновляет следующие доступные ID для билетов и мест проведения.
-     *
-     * @param dumpManager Менеджер для работы с файлом данных.
-     */
-    public TicketCollection(DumpManager dumpManager){
+    public TicketCollection(DumpManager dumpManager) {
         this();
         this.dumpManager = dumpManager;
         loadCollection();
         updateNextId();
     }
+
     public TicketCollection(String filePath) {
         this(new DumpManager(filePath));
     }
 
-    /**
-     * Загружает коллекцию билетов из файла. Проверяет наличие дубликатов среди ID билетов.
-     * В случае обнаружения дубликатов выбрасывает исключение.
-     */
     public void loadCollection() {
         Collection<Ticket> loadedTickets = dumpManager.readCollection().getTickets();
+        writeLock.lock();
         try {
             for (Ticket ticket : loadedTickets) {
                 if (ticket != null) {
@@ -68,123 +63,117 @@ public class TicketCollection {
             }
         } catch (DuplicateException e) {
             System.err.println("Ошибка загрузки коллекции: " + e.getMessage());
+        } finally {
+            writeLock.unlock();
         }
     }
 
-    /**
-     * Проверяет наличие билета с указанным ID в коллекции.
-     *
-     * @param id идентификатор билета для поиска.
-     * @return true, если билет с таким ID присутствует в коллекции, иначе false.
-     */
     public boolean contains(int id) {
-        return tickets.stream().anyMatch(ticket -> ticket.getId() == id);
+        readLock.lock();
+        try {
+            return tickets.stream().anyMatch(ticket -> ticket.getId() == id);
+        } finally {
+            readLock.unlock();
+        }
     }
 
-    /**
-     * Возвращает дату инициализации коллекции.
-     *
-     * @return Дата инициализации.
-     */
     public LocalDateTime getInitializationDate() {
         return initializationDate;
     }
 
-    /**
-     * Возвращает время последнего сохранения коллекции.
-     *
-     * @return Время последнего сохранения.
-     */
     public LocalDateTime getLastSaveTime() {
         return lastSaveTime;
     }
 
-    /**
-     * Возвращает коллекцию билетов.
-     *
-     * @return Коллекция билетов.
-     */
     public ArrayList<Ticket> getTickets() {
-        return tickets;
-    }
-
-    /**
-     * Добавляет билет в коллекцию.
-     *
-     * @param ticket Билет для добавления.
-     * @return true, если билет был успешно добавлен, иначе false.
-     */
-    public boolean add(Ticket ticket) {
-        return tickets.add(ticket);
-    }
-
-
-    /**
-    * Обновляет билет в коллекции, заменяя его на предоставленный билет с тем же ID.
-    *
-    * @param newTicket Билет с обновленной информацией.
-     */
-    public void update(Ticket newTicket) {
-        for (int i = 0; i < tickets.size(); i++) {
-            if (tickets.get(i).getId() == newTicket.getId()) {
-                tickets.set(i, newTicket);
-                return;
-            }
+        readLock.lock();
+        try {
+            return new ArrayList<>(tickets);
+        } finally {
+            readLock.unlock();
         }
     }
 
-    /**
-     * Удаляет билет с указанным ID из коллекции.
-     *
-     * @param id идентификатор билета для удаления.
-     * @return true, если билет был найден и удален, иначе false.
-     */
+    public boolean add(Ticket ticket) {
+        writeLock.lock();
+        try {
+            return tickets.add(ticket);
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    public void update(Ticket newTicket) {
+        writeLock.lock();
+        try {
+            for (int i = 0; i < tickets.size(); i++) {
+                if (tickets.get(i).getId() == newTicket.getId()) {
+                    tickets.set(i, newTicket);
+                    return;
+                }
+            }
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
     public boolean remove(long id) {
-        return tickets.removeIf(ticket -> ticket.getId() == id);
+        writeLock.lock();
+        try {
+            return tickets.removeIf(ticket -> ticket.getId() == id);
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("TicketCollection{");
-        for (Ticket ticket : tickets) {
-            sb.append("\n").append(ticket.toString());
+        readLock.lock();
+        try {
+            StringBuilder sb = new StringBuilder("TicketCollection{");
+            for (Ticket ticket : tickets) {
+                sb.append("\n").append(ticket.toString());
+            }
+            sb.append("\n}");
+            return sb.toString();
+        } finally {
+            readLock.unlock();
         }
-        sb.append("\n}");
-        return sb.toString();
     }
 
-    /**
-     * Удаляет билет из коллекции, расположенный на указанной позиции.
-     *
-     * @param index индекс билета для удаления.
-     * @return true, если билет на заданной позиции был успешно удален, иначе false.
-     */
     public boolean removeAt(int index) {
-        if (index >= 0 && index < tickets.size()) {
-            tickets.remove(index);
-            return true;
+        writeLock.lock();
+        try {
+            if (index >= 0 && index < tickets.size()) {
+                tickets.remove(index);
+                return true;
+            }
+            return false;
+        } finally {
+            writeLock.unlock();
         }
-        return false;
     }
 
-    /**
-     * Обновляет идентификаторы nextId для классов Ticket и Venue на основе максимального существующего ID в коллекции.
-     */
     public void updateNextId() {
-        int maxTicketId = tickets.stream()
-                .mapToInt(Ticket::getId)
-                .max()
-                .orElse(0);
+        writeLock.lock();
+        try {
+            int maxTicketId = tickets.stream()
+                    .mapToInt(Ticket::getId)
+                    .max()
+                    .orElse(0);
 
-        long maxVenueId = tickets.stream()
-                .filter(ticket -> ticket.getVenue() != null)
-                .mapToLong(ticket -> ticket.getVenue().getId())
-                .max()
-                .orElse(0L);
+            long maxVenueId = tickets.stream()
+                    .filter(ticket -> ticket.getVenue() != null)
+                    .mapToLong(ticket -> ticket.getVenue().getId())
+                    .max()
+                    .orElse(0L);
 
-        long nextId = Math.max(maxTicketId, maxVenueId) + 1;
+            long nextId = Math.max(maxTicketId, maxVenueId) + 1;
 
-        Ticket.updateNextId((int) nextId);
-        Venue.updateNextId(nextId);
+            Ticket.updateNextId((int) nextId);
+            Venue.updateNextId(nextId);
+        } finally {
+            writeLock.unlock();
+        }
     }
 }

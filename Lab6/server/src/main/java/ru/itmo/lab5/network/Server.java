@@ -1,7 +1,7 @@
 package ru.itmo.lab5.network;
 import ru.itmo.lab5.manager.Console;
 import ru.itmo.lab5.util.Task;
-
+import java.util.concurrent.*;
 import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
@@ -20,6 +20,9 @@ public class Server {
 
     private final Map<Integer, ByteBuffer> receivedPackets = new TreeMap<>();
 
+    private final ForkJoinPool receivePool = new ForkJoinPool();
+    private final ForkJoinPool processPool = new ForkJoinPool();
+    private final ExecutorService responsePool = Executors.newCachedThreadPool();
 
 
     public Server(Console console) throws IOException {
@@ -37,12 +40,12 @@ public class Server {
                 SocketAddress remoteAddr = channel.receive(buffer);
                 buffer.flip();
                 if (buffer.remaining() >= 8) {
-                    processPacket(buffer, remoteAddr);
+                    receivePool.execute(() -> processPacket(buffer, remoteAddr));
                 }
             }
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Ошибка при получении задачи: " + e.getMessage());
-        } //tcp/tcp ip , обьектный граф, osi, singltone / abstract fabric
+        }
     }
 
     private void processPacket(ByteBuffer buffer, SocketAddress remoteAddr) {
@@ -62,12 +65,24 @@ public class Server {
 
             if (receivedPackets.size() == expectedTotalPackets) {
                 ByteBuffer completeData = assembleData();
-                Task task = deserializeTask(completeData);
-                logger.info("Выполнение команды");
-                Task responseTask = console.start(task);
-                logger.info("Отправка ответа");
-                sendResponse(responseTask, remoteAddr);
-                resetState();
+                processPool.execute(() -> {
+                    try {
+                        Task task = deserializeTask(completeData);
+                        logger.info("Выполнение команды");
+                        Task responseTask = console.start(task);
+                        logger.info("Отправка ответа");
+                        responsePool.execute(() -> {
+                            try {
+                                sendResponse(responseTask, remoteAddr);
+                            } catch (IOException e) {
+                                logger.log(Level.SEVERE, "Ошибка при отправке ответа: " + e.getMessage());
+                            }
+                        });
+                        resetState();
+                    } catch (Exception e) {
+                        logger.log(Level.SEVERE, "Ошибка при обработке задачи: " + e.getMessage());
+                    }
+                });
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Ошибка при обработке задачи: " + e.getMessage());
