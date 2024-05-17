@@ -18,7 +18,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class TicketCollection {
     @XmlElement(name = "ticket")
     private final ArrayList<Ticket> tickets;
+    @XmlTransient
     private final LocalDateTime initializationDate;
+    @XmlTransient
     private LocalDateTime lastSaveTime;
     @XmlTransient
     private DumpManager dumpManager;
