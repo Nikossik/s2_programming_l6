@@ -79,10 +79,6 @@ public class TicketCollection {
         }
     }
 
-    public LocalDateTime getInitializationDate() {
-        return initializationDate;
-    }
-
     public LocalDateTime getLastSaveTime() {
         return lastSaveTime;
     }

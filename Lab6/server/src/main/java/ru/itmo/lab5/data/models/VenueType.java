@@ -1,7 +1,10 @@
 package ru.itmo.lab5.data.models;
 
-import java.io.Serializable;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.io.Serializable;
+@Getter
 public enum VenueType implements Serializable {
     LOFT,
     OPEN_AREA,

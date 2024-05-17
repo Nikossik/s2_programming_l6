@@ -1,25 +1,28 @@
 package ru.itmo.lab5.manager.commands;
 
-import ru.itmo.lab5.data.TicketCollection;
+import ru.itmo.lab5.manager.DatabaseHandler;
 import ru.itmo.lab5.util.Task;
 
 /**
  * Команда для удаления элемента из коллекции по его ID.
  */
 public class RemoveByIDCommand extends Command {
+    private final DatabaseHandler dbHandler;
+
     /**
      * Конструктор команды remove_by_id.
      *
-     * @param ticketCollection Коллекция билетов, с которой работает команда.
+     * @param dbHandler Обработчик базы данных для взаимодействия с БД.
      */
-    public RemoveByIDCommand(TicketCollection ticketCollection) {
-        super("remove_by_id <id>", "Удаляет первый элемент из коллекции", ticketCollection);
+    public RemoveByIDCommand(DatabaseHandler dbHandler) {
+        super("remove_by_id <id>", "Удаляет элемент из коллекции по его ID", dbHandler);
+        this.dbHandler = dbHandler;
     }
 
     @Override
-    public Task execute(Task task) {
-        if (task.describe[1].isEmpty()) {
-            return new Task(new String[]{"использование: '" + getName() + "'"});
+    public Task execute(Task task, DatabaseHandler dbHandler) {
+        if (task.describe.length < 2 || task.describe[1].isEmpty()) {
+            return new Task(new String[]{"использование: '" + getName() + " <id>'"});
         }
         long id;
         try {
@@ -28,7 +31,7 @@ public class RemoveByIDCommand extends Command {
             return new Task(new String[]{"ID должен быть числом. Передано неверное значение: " + task.describe[1]});
         }
 
-        boolean removed = ticketCollection.remove(id);
+        boolean removed = this.dbHandler.removeById(id);
 
         if (removed) {
             return new Task(new String[]{"Элемент с ID " + id + " был успешно удален из коллекции."});
@@ -37,4 +40,3 @@ public class RemoveByIDCommand extends Command {
         }
     }
 }
-

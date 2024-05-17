@@ -1,24 +1,23 @@
 package ru.itmo.lab5.manager.commands;
 
-import ru.itmo.lab5.data.TicketCollection;
+import ru.itmo.lab5.manager.DatabaseHandler;
 import ru.itmo.lab5.util.Task;
 
 /**
  * Команда для вывода справки по доступным командам.
  */
-
 public class HelpCommand extends Command {
     /**
      * Конструктор команды help.
      *
-     * @param ticketCollection Коллекция билетов, с которой работает команда.
+     * @param dbHandler Обработчик базы данных.
      */
-    public HelpCommand(TicketCollection ticketCollection) {
-        super("help", "Выводит справку по доступным командам", ticketCollection);
+    public HelpCommand(DatabaseHandler dbHandler) {
+        super("help", "Выводит справку по доступным командам", dbHandler);
     }
 
     @Override
-    public Task execute(Task task) {
+    public Task execute(Task task, DatabaseHandler dbHandler) {
         String answer = """
                 Доступные команды:
                 add - Добавляет новый билет в коллекцию
@@ -30,7 +29,7 @@ public class HelpCommand extends Command {
                 show - Выводит все элементы коллекции
                 clear - Очищает коллекцию
                 save - Сохраняет коллекцию в файл
-                remove_by_id - Удаляет первый элемент из коллекции
+                remove_by_id - Удаляет элемент из коллекции по его ID
                 print_field_descending_venue - Выводит значения поля venue всех элементов в порядке убывания
                 help - Выводит справку по доступным командам
                 exit - Завершает программу

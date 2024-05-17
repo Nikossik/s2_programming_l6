@@ -1,36 +1,40 @@
 package ru.itmo.lab5.manager.commands;
 
-import ru.itmo.lab5.data.TicketCollection;
+import ru.itmo.lab5.manager.DatabaseHandler;
 import ru.itmo.lab5.data.models.Ticket;
 import ru.itmo.lab5.util.Task;
 
 /**
- * Команда для добавления нового билета в коллекцию.
- * Запрашивает у пользователя данные для создания билета и добавляет его в коллекцию.
+ * Команда для добавления нового билета в базу данных.
+ * спользует данные из задачи для создания и добавления билета.
  */
 public class AddCommand extends Command {
+
     /**
      * Конструктор для команды добавления билета.
      *
-     * @param ticketCollection Коллекция, в которую будет добавлен билет.
+     * @param dbHandler Обработчик базы данных для взаимодействия с БД.
      */
-    public AddCommand(TicketCollection ticketCollection) {
-        super("add", "Добавляет новый билет в коллекцию", ticketCollection);
+    public AddCommand(DatabaseHandler dbHandler) {
+        super("add", "Добавляет новый билет в коллекцию", dbHandler);
     }
 
     @Override
-    public Task execute(Task task) {
+    public Task execute(Task task, DatabaseHandler dbHandler) {
         try {
             Ticket ticket = task.ticket;
             if (ticket.validate()) {
-                ticketCollection.add(ticket);
-                return new Task(new String[]{"Билет успешно добавлен."});
+                Ticket addedTicket = DatabaseHandler.createTicket(ticket, task.username);
+                if (addedTicket != null) {
+                    return new Task(new String[]{"Билет успешно добавлен."});
+                } else {
+                    return new Task(new String[]{"Ошибка при добавлении билета в базу данных."});
+                }
             } else {
-                new Task(new String[]{"Невозможно добавить билет: некорректные данные."});
+                return new Task(new String[]{"Невозможно добавить билет: некорректные данные."});
             }
         } catch (Exception e) {
-            new Task(new String[]{"Ошибка при добавлении билета: " + e.getMessage()});
+            return new Task(new String[]{"Ошибка при добавлении билета: " + e.getMessage()});
         }
-        return new Task(new String[]{"Ошибка"});
     }
 }

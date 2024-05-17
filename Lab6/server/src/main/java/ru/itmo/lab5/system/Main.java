@@ -1,15 +1,12 @@
 package ru.itmo.lab5.system;
 
-import ru.itmo.lab5.data.TicketCollection;
+import ru.itmo.lab5.manager.DatabaseHandler;
 import ru.itmo.lab5.manager.CommandInvoker;
 import ru.itmo.lab5.manager.Console;
-import ru.itmo.lab5.manager.DumpManager;
 import ru.itmo.lab5.network.Server;
 import sun.misc.Signal;
 
 import java.io.IOException;
-
-
 
 public class Main {
     private static void setSignalProcessing(String... signalNames) {
@@ -23,22 +20,17 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        String filePath = "Lab6/data/file.xml";
-
-        new Thread(() ->{
+        new Thread(() -> {
             try {
-                DumpManager dumpManager = new DumpManager(filePath);
-
-                TicketCollection ticketCollection = new TicketCollection(dumpManager);
-
-                CommandInvoker commandInvoker = new CommandInvoker(ticketCollection, dumpManager);
-                Server server= new Server(new Console(commandInvoker));
+                DatabaseHandler dbHandler = new DatabaseHandler();
+                CommandInvoker commandInvoker = new CommandInvoker(dbHandler);
+                Server server = new Server(new Console(commandInvoker));
                 server.runServer();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }).start();
-        setSignalProcessing(
-                "INT", "TERM", "TSTP", "BREAK", "EOF");
+
+        setSignalProcessing("INT", "TERM", "TSTP", "BREAK", "EOF");
     }
 }

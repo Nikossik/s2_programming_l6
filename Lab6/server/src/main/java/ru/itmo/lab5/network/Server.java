@@ -1,6 +1,8 @@
 package ru.itmo.lab5.network;
+
 import ru.itmo.lab5.manager.Console;
 import ru.itmo.lab5.util.Task;
+
 import java.util.concurrent.*;
 import java.io.*;
 import java.net.*;
@@ -23,7 +25,6 @@ public class Server {
     private final ForkJoinPool receivePool = new ForkJoinPool();
     private final ForkJoinPool processPool = new ForkJoinPool();
     private final ExecutorService responsePool = Executors.newCachedThreadPool();
-
 
     public Server(Console console) throws IOException {
         this.console = console;
@@ -69,7 +70,7 @@ public class Server {
                     try {
                         Task task = deserializeTask(completeData);
                         logger.info("Выполнение команды");
-                        Task responseTask = console.start(task);
+                        Task responseTask = console.start(task); // Передаем dbHandler
                         logger.info("Отправка ответа");
                         responsePool.execute(() -> {
                             try {
