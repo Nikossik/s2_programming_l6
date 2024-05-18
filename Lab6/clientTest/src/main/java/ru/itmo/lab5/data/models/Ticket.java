@@ -3,9 +3,7 @@ package ru.itmo.lab5.data.models;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -19,6 +17,8 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class Ticket implements Comparable<Ticket>, Serializable {
     private static int nextId = 0;
     private int id; // Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
@@ -28,6 +28,7 @@ public class Ticket implements Comparable<Ticket>, Serializable {
     private Long price; // Поле может быть null, Значение поля должно быть больше 0
     private TicketType type; // Поле может быть null
     private Venue venue; // Поле может быть null
+    private String username;
 
     /**
      * Создает новый экземпляр билета с указанными параметрами.
@@ -38,7 +39,7 @@ public class Ticket implements Comparable<Ticket>, Serializable {
      * @param type        Тип билета.
      * @param venue       Место проведения.
      */
-    public Ticket(String name, Coordinates coordinates, Long price, TicketType type, Venue venue) {
+    public Ticket(String name, Coordinates coordinates, Long price, TicketType type, Venue venue, String username) {
         this.id = ++nextId;
         this.name = name;
         this.coordinates = coordinates;
@@ -46,6 +47,7 @@ public class Ticket implements Comparable<Ticket>, Serializable {
         this.price = price;
         this.type = type;
         this.venue = venue;
+        this.username = username;
     }
 
     /**
@@ -91,13 +93,5 @@ public class Ticket implements Comparable<Ticket>, Serializable {
      */
     public static void updateNextId(int nextIdValue) {
         nextId = nextIdValue;
-    }
-
-    public String getVenueName() {
-        return venue.getName();
-    }
-
-    public int getVenueCapacity() {
-        return venue.getCapacity();
     }
 }

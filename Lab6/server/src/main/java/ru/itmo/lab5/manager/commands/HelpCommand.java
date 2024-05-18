@@ -1,6 +1,6 @@
 package ru.itmo.lab5.manager.commands;
 
-import ru.itmo.lab5.manager.DatabaseHandler;
+import ru.itmo.lab5.manager.CollectionManager;
 import ru.itmo.lab5.util.Task;
 
 /**
@@ -10,14 +10,14 @@ public class HelpCommand extends Command {
     /**
      * Конструктор команды help.
      *
-     * @param dbHandler Обработчик базы данных.
+     * @param collectionManager Менеджер коллекции для взаимодействия с коллекцией.
      */
-    public HelpCommand(DatabaseHandler dbHandler) {
-        super("help", "Выводит справку по доступным командам", dbHandler);
+    public HelpCommand(CollectionManager collectionManager) {
+        super("help", "Выводит справку по доступным командам", collectionManager);
     }
 
     @Override
-    public Task execute(Task task, DatabaseHandler dbHandler) {
+    public Task execute(Task task) {
         String answer = """
                 Доступные команды:
                 add - Добавляет новый билет в коллекцию

@@ -31,7 +31,7 @@ public class Execute_script {
                             System.exit(0);
                         }
                         if ("add".equalsIgnoreCase(commandComponents[0]) || "add_if_min".equalsIgnoreCase(commandComponents[0]) || "update_id".equalsIgnoreCase(commandComponents[0])) {
-                            task.ticket = TicketBuilder.buildTicket();
+                            task.setTicket(TicketBuilder.buildTicket());
                         }
                         client.sendTask(task);
                     } else {

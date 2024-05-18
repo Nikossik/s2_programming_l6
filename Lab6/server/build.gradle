@@ -24,6 +24,8 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
     testCompileOnly 'org.projectlombok:lombok:1.18.20'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+
+    implementation 'org.postgresql:postgresql:42.3.1'
 }
 
 tasks.register('testing') {
@@ -43,7 +45,6 @@ run {
     environment 'Lab', 'data/file.xml'
 }
 shadowJar {
-
     setMainClassName('ru.itmo.lab5.system.Main')
     archiveBaseName.set('Jar/Lab6')
     configurations = [project.configurations.compileClasspath]

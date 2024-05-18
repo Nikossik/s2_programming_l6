@@ -28,6 +28,7 @@ public class Ticket implements Comparable<Ticket>, Serializable {
     private Long price; // Поле может быть null, Значение поля должно быть больше 0
     private TicketType type; // Поле может быть null
     private Venue venue; // Поле может быть null
+    private String username;
 
     /**
      * Создает новый экземпляр билета с указанными параметрами.
@@ -38,7 +39,7 @@ public class Ticket implements Comparable<Ticket>, Serializable {
      * @param type        Тип билета.
      * @param venue       Место проведения.
      */
-    public Ticket(String name, Coordinates coordinates, Long price, TicketType type, Venue venue) {
+    public Ticket(String name, Coordinates coordinates, Long price, TicketType type, Venue venue, String username) {
         this.id = ++nextId;
         this.name = name;
         this.coordinates = coordinates;
@@ -46,6 +47,7 @@ public class Ticket implements Comparable<Ticket>, Serializable {
         this.price = price;
         this.type = type;
         this.venue = venue;
+        this.username = username;
     }
 
     /**
@@ -70,7 +72,6 @@ public class Ticket implements Comparable<Ticket>, Serializable {
      */
     @Override
     public int compareTo(Ticket o) {
-        // Сначала сравниваем по цене
         if (this.price != null && o.price != null) {
             int priceCompare = this.price.compareTo(o.price);
             if (priceCompare != 0) {

@@ -5,34 +5,36 @@ import ru.itmo.lab5.util.Task;
 import ru.itmo.lab5.util.TicketBuilder;
 
 import java.io.IOException;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Console {
-
-    /**
-     * Сканер для чтения команд из стандартного ввода.
-     */
     private final Scanner scanner;
     private final Client client;
+    private static final Logger logger = Logger.getLogger(Console.class.getName());
+    private String username;
+    private String password;
 
     public Console(Client client) throws IOException {
         this.scanner = new Scanner(System.in);
-        this.client =  new Client();
+        this.client = new Client();
     }
 
-    /**
-     * Запускает интерактивную сессию командной строки для управления коллекцией билетов.
-     * Пользователь вводит команды до тех пор, пока не решит выйти из программы командой 'exit'.
-     */
     public void start() {
         try {
-            System.out.println("Добро пожаловать в консоль управления билетами. Введите 'help' для получения списка команд.");
+            System.out.println("Welcome to the ticket management console. Please log in or register.");
+            while (!authenticate()) {
+                System.out.println("Failed to log in or register. Please try again.");
+            }
+
+            System.out.println("Enter 'help' for a list of commands.");
             String[] userCommand;
             while (true) {
-                Task task= new Task();
+                Task task = new Task();
+                task.setUsername(this.username);
+                task.setPassword(this.password);
                 System.out.print("> ");
                 if (!scanner.hasNextLine()) {
                     break;
@@ -43,27 +45,78 @@ public class Console {
                 if ("exit".equalsIgnoreCase(userCommand[0])) {
                     System.exit(0);
                 }
+                task.setDescribe(userCommand);
                 if ("add".equalsIgnoreCase(userCommand[0]) || "add_if_min".equalsIgnoreCase(userCommand[0]) || "update_id".equalsIgnoreCase(userCommand[0])) {
-                    task.ticket = TicketBuilder.buildTicket();
+                    task.setTicket(TicketBuilder.buildTicket());
                 }
                 try {
                     if ("execute_script".equalsIgnoreCase(userCommand[0])) {
-
-                    }
-                    else{
-                        task.describe= userCommand;
+                        System.out.println("later");
+                    } else {
                         client.sendTask(task);
                     }
                 } catch (NoSuchElementException e) {
-                    System.out.println("Команда '" + input + "' не найдена. Введите 'help' для помощи");
+                    System.out.println("Command '" + input + "' not found. Enter 'help' for assistance.");
                 } catch (IOException | ClassNotFoundException e) {
-                    throw new RuntimeException(e);
+                    logger.log(Level.SEVERE, "Error executing command: " + e.getMessage(), e);
                 }
             }
         } catch (NoSuchElementException | IllegalStateException e) {
-            System.err.println("Ошибка ввода. Экстренное завершение программы.");
+            logger.log(Level.SEVERE, "Input error. Exiting program.", e);
         }
     }
 
+    private boolean authenticate() {
+        while (true) {
+            System.out.print("Enter command (login/register): ");
+            String command = scanner.nextLine().trim();
 
+            if ("login".equalsIgnoreCase(command)) {
+                if (login()) {
+                    return true;
+                } else {
+                    System.out.println("Login failed.");
+                }
+            } else if ("register".equalsIgnoreCase(command)) {
+                if (register()) {
+                    System.out.println("Registration successful.");
+                    return true;
+                } else {
+                    System.out.println("Registration failed.");
+                }
+            } else {
+                System.out.println("Unknown command. Please enter 'login' or 'register'.");
+            }
+        }
+    }
+
+    private boolean login() {
+        System.out.print("Enter username: ");
+        this.username = scanner.nextLine().trim();
+        System.out.print("Enter password: ");
+        this.password = scanner.nextLine().trim();
+
+        Task task = new Task(new String[]{"login"}, null, this.username, this.password);
+        try {
+            return client.sendTask(task);
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Error during login: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean register() {
+        System.out.print("Enter username: ");
+        this.username = scanner.nextLine().trim();
+        System.out.print("Enter password: ");
+        this.password = scanner.nextLine().trim();
+
+        Task task = new Task(new String[]{"register"}, null, this.username, this.password);
+        try {
+            return client.sendTask(task);
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Error during registration: " + e.getMessage());
+            return false;
+        }
+    }
 }

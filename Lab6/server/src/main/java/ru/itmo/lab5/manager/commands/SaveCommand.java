@@ -1,39 +1,33 @@
 package ru.itmo.lab5.manager.commands;
 
-import ru.itmo.lab5.data.models.Ticket;
-import ru.itmo.lab5.manager.DatabaseHandler;
+import ru.itmo.lab5.manager.CollectionManager;
 import ru.itmo.lab5.util.Task;
-
-import java.util.List;
 
 /**
  * Команда для сохранения текущего состояния коллекции в базу данных.
  */
-@SuppressWarnings("unchecked")
 public class SaveCommand extends Command {
-    private final DatabaseHandler dbHandler;
+    private final CollectionManager collectionManager;
 
-    /**
-     * Конструктор команды save.
-     *
-     * @param dbHandler Обработчик базы данных для взаимодействия с БД.
-     */
-    public SaveCommand( DatabaseHandler dbHandler) {
-        super("save", "Сохраняет коллекцию в базу данных", dbHandler);
-        this.dbHandler = dbHandler;
+    public SaveCommand(CollectionManager collectionManager) {
+        super("save", "Saves the current collection state to the database", collectionManager);
+        this.collectionManager = collectionManager;
     }
 
     @Override
-    public Task execute(Task task, DatabaseHandler dbHandler) {
-        try {
-            boolean isSaved = this.dbHandler.saveCollectionToDatabase((List<Ticket>) task.ticket);
-            if (isSaved) {
-                return new Task(new String[]{"Коллекция сохранена в базу данных"});
-            } else {
-                return new Task(new String[]{"Ошибка при сохранении коллекции в базу данных"});
+    public Task execute(Task task) {
+        if (!collectionManager.getTickets().isEmpty()) {
+            try {
+                if (collectionManager.saveToDatabase()) {
+                    return new Task(new String[]{"Collection saved to database."});
+                } else {
+                    return new Task(new String[]{"Error saving collection to database."});
+                }
+            } catch (Exception e) {
+                return new Task(new String[]{"Error saving collection: " + e.getMessage()});
             }
-        } catch (Exception e) {
-            return new Task(new String[]{"Ошибка при сохранении коллекции: " + e.getMessage()});
+        } else {
+            return new Task(new String[]{"Collection is empty!"});
         }
     }
 }

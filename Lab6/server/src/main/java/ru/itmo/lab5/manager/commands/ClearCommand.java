@@ -1,36 +1,29 @@
 package ru.itmo.lab5.manager.commands;
 
-import ru.itmo.lab5.manager.DatabaseHandler;
+import ru.itmo.lab5.manager.CollectionManager;
 import ru.itmo.lab5.util.Task;
 
 /**
- * Команда для очистки коллекции билетов в базе данных.
- * Удаляет все элементы из базы данных.
+ * Команда для очистки коллекции билетов.
+ * Удаляет все элементы из коллекции.
  */
 public class ClearCommand extends Command {
-    private final DatabaseHandler dbHandler;
+
+    private final CollectionManager collectionManager;
 
     /**
      * Конструктор для команды очистки коллекции.
      *
-     * @param dbHandler Обработчик базы данных для взаимодействия с БД.
+     * @param collectionManager Менеджер коллекции для взаимодействия с коллекцией.
      */
-    public ClearCommand(DatabaseHandler dbHandler) {
-        super("clear", "Очищает коллекцию", dbHandler);
-        this.dbHandler = dbHandler;
+    public ClearCommand(CollectionManager collectionManager) {
+        super("clear", "Очищает коллекцию", collectionManager);
+        this.collectionManager = collectionManager;
     }
 
     @Override
-    public Task execute(Task task, DatabaseHandler dbHandler) {
-        try {
-            boolean isCleared = this.dbHandler.clearTickets();
-            if (isCleared) {
-                return new Task(new String[]{"Коллекция успешно очищена."});
-            } else {
-                return new Task(new String[]{"Не удалось очистить коллекцию."});
-            }
-        } catch (Exception e) {
-            return new Task(new String[]{"Ошибка при очистке коллекции: " + e.getMessage()});
-        }
+    public Task execute(Task task) {
+        collectionManager.clear();
+        return new Task(new String[]{"Коллекция успешно очищена."});
     }
 }

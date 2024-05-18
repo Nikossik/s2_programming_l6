@@ -1,20 +1,21 @@
 package ru.itmo.lab5.data;
 
 import jakarta.xml.bind.annotation.*;
+import lombok.Getter;
+import lombok.Setter;
 import ru.itmo.lab5.data.models.Ticket;
 import ru.itmo.lab5.data.models.Venue;
-import ru.itmo.lab5.exceptions.DuplicateException;
-import ru.itmo.lab5.manager.DumpManager;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @XmlRootElement(name = "ticketCollection")
 @XmlAccessorType(XmlAccessType.FIELD)
+@Getter
+@Setter
 public class TicketCollection {
     @XmlElement(name = "ticket")
     private final ArrayList<Ticket> tickets;
@@ -22,8 +23,6 @@ public class TicketCollection {
     private final LocalDateTime initializationDate;
     @XmlTransient
     private LocalDateTime lastSaveTime;
-    @XmlTransient
-    private DumpManager dumpManager;
 
     @XmlTransient
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
@@ -36,57 +35,13 @@ public class TicketCollection {
         this.tickets = new ArrayList<>();
         this.initializationDate = LocalDateTime.now();
         lastSaveTime = LocalDateTime.now();
-    }
-
-    public TicketCollection(DumpManager dumpManager) {
-        this();
-        this.dumpManager = dumpManager;
-        loadCollection();
         updateNextId();
-    }
-
-    public TicketCollection(String filePath) {
-        this(new DumpManager(filePath));
-    }
-
-    public void loadCollection() {
-        Collection<Ticket> loadedTickets = dumpManager.readCollection().getTickets();
-        writeLock.lock();
-        try {
-            for (Ticket ticket : loadedTickets) {
-                if (ticket != null) {
-                    int id = ticket.getId();
-                    if (this.contains(id)) {
-                        throw new DuplicateException("Duplicate Ticket ID: " + id);
-                    } else {
-                        tickets.add(ticket);
-                    }
-                }
-            }
-        } catch (DuplicateException e) {
-            System.err.println("Ошибка загрузки коллекции: " + e.getMessage());
-        } finally {
-            writeLock.unlock();
-        }
-    }
-
-    public boolean contains(int id) {
-        readLock.lock();
-        try {
-            return tickets.stream().anyMatch(ticket -> ticket.getId() == id);
-        } finally {
-            readLock.unlock();
-        }
-    }
-
-    public LocalDateTime getLastSaveTime() {
-        return lastSaveTime;
     }
 
     public ArrayList<Ticket> getTickets() {
         readLock.lock();
         try {
-            return new ArrayList<>(tickets);
+            return tickets;
         } finally {
             readLock.unlock();
         }
@@ -119,6 +74,19 @@ public class TicketCollection {
         writeLock.lock();
         try {
             return tickets.removeIf(ticket -> ticket.getId() == id);
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    public boolean removeFirst() {
+        writeLock.lock();
+        try {
+            if (!tickets.isEmpty()) {
+                tickets.remove(0);
+                return true;
+            }
+            return false;
         } finally {
             writeLock.unlock();
         }

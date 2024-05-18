@@ -8,45 +8,43 @@ import java.util.Map;
 
 public class CommandInvoker {
     private final Map<String, Command> commandMap = new HashMap<>();
-    private final DatabaseHandler databaseHandler;
+    private final CollectionManager collectionManager;
+    private final DatabaseHandler dbHandler;
 
-    public CommandInvoker(DatabaseHandler databaseHandler) {
-        this.databaseHandler = databaseHandler;
+    public CommandInvoker(CollectionManager collectionManager, DatabaseHandler dbHandler) {
+        this.collectionManager = collectionManager;
+        this.dbHandler = dbHandler;
         registerCommands();
     }
 
     private void registerCommands() {
-        register("help", new HelpCommand(databaseHandler));
-        register("info", new InfoCommand(databaseHandler));
-        register("show", new ShowCommand(databaseHandler));
-        register("add", new AddCommand(databaseHandler));
-        register("update_id", new UpdateIDCommand(databaseHandler));
-        register("remove_by_id", new RemoveByIDCommand(databaseHandler));
-        register("clear", new ClearCommand(databaseHandler));
-        register("remove_at", new RemoveAtCommand(databaseHandler));
-        register("remove_first", new RemoveFirstCommand(databaseHandler));
-        register("add_if_min", new AddIfMinCommand(databaseHandler));
-        register("filter_less_than_venue", new FilterLessThanVenueCommand(databaseHandler));
-        register("print_descending", new PrintDescendingCommand(databaseHandler));
-        register("print_field_descending_venue", new PrintFieldDescendingVenueCommand(databaseHandler));
-        register("SaveCommand", new SaveCommand(databaseHandler));
+        register("register", new RegisterCommand(dbHandler));
+        register("login", new LoginCommand(dbHandler));
+        register("add", new AddCommand(collectionManager));
+        register("clear", new ClearCommand(collectionManager));
+        register("info", new InfoCommand(collectionManager));
+        register("remove_at", new RemoveAtCommand(collectionManager));
+        register("remove_by_id", new RemoveByIDCommand(collectionManager));
+        register("remove_first", new RemoveFirstCommand(collectionManager));
+        register("show", new ShowCommand(collectionManager));
+        register("update_id", new UpdateIDCommand(collectionManager));
+        register("filter_less_than_venue", new FilterLessThanVenueCommand(collectionManager));
+        register("print_descending", new PrintDescendingCommand(collectionManager));
+        register("print_field_descending_venue", new PrintFieldDescendingVenueCommand(collectionManager));
+        register("help", new HelpCommand(collectionManager));
+        register("save", new SaveCommand(collectionManager));
     }
 
-    private void register(String commandName, Command command) {
+    public void register(String commandName, Command command) {
         commandMap.put(commandName, command);
     }
 
     public Task executeCommand(Task task) {
-        String commandName = task.describe[0].toLowerCase();
-        Command command = commandMap.get(commandName);
+        Command command = commandMap.get(task.getDescribe()[0]);
         if (command != null) {
-            return command.execute(task, databaseHandler);
+            return command.execute(task);
         } else {
-            return new Task(new String[]{"Неизвестная команда '" + commandName + "'. Введите 'help' для получения списка команд."});
+            return new Task(new String[]{"Неизвестная команда. Введите 'help' для помощи."});
         }
-    }
-
-    public Map<String, Command> getCommands() {
-        return commandMap;
     }
 }

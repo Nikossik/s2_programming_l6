@@ -1,9 +1,13 @@
 package ru.itmo.lab5.util;
 
+import lombok.Getter;
+import lombok.Setter;
 import ru.itmo.lab5.data.models.Ticket;
 
 import java.io.Serializable;
 
+@Getter
+@Setter
 public class Task implements Serializable {
     public String[] describe;
     public Ticket ticket;
@@ -15,11 +19,6 @@ public class Task implements Serializable {
     }
 
     public Task() {
-    }
-
-    public Task(String[] describe, Ticket ticket) {
-        this.describe = describe;
-        this.ticket = ticket;
     }
 
     public Task(String[] describe, Ticket ticket, String username, String password) {
