@@ -1,6 +1,7 @@
 package ru.itmo.lab5.manager;
 
 import ru.itmo.lab5.network.Client;
+import ru.itmo.lab5.util.Execute_script;
 import ru.itmo.lab5.util.Task;
 import ru.itmo.lab5.util.TicketBuilder;
 
@@ -16,10 +17,12 @@ public class Console {
     private static final Logger logger = Logger.getLogger(Console.class.getName());
     private String username;
     private String password;
+    private final Execute_script executeScript;
 
     public Console(Client client) throws IOException {
         this.scanner = new Scanner(System.in);
         this.client = new Client();
+        this.executeScript = new Execute_script();
     }
 
     public void start() {
@@ -47,11 +50,11 @@ public class Console {
                 }
                 task.setDescribe(userCommand);
                 if ("add".equalsIgnoreCase(userCommand[0]) || "add_if_min".equalsIgnoreCase(userCommand[0]) || "update_id".equalsIgnoreCase(userCommand[0])) {
-                    task.setTicket(TicketBuilder.buildTicket());
+                    task.setTicket(TicketBuilder.buildTicket(username));
                 }
                 try {
                     if ("execute_script".equalsIgnoreCase(userCommand[0])) {
-                        System.out.println("later");
+                        executeScript.readScript(userCommand[1], client, username);
                     } else {
                         client.sendTask(task);
                     }

@@ -1,6 +1,7 @@
 package ru.itmo.lab5.manager.commands;
 
 import ru.itmo.lab5.manager.CollectionManager;
+import ru.itmo.lab5.manager.DatabaseHandler;
 import ru.itmo.lab5.util.Task;
 
 import java.time.format.DateTimeFormatter;
@@ -9,16 +10,11 @@ import java.time.format.DateTimeFormatter;
  * Команда для вывода информации о коллекции билетов.
  */
 public class InfoCommand extends Command {
-    private final CollectionManager collectionManager;
 
-    /**
-     * Конструктор команды info.
-     *
-     * @param collectionManager Менеджер коллекции для взаимодействия с коллекцией.
-     */
-    public InfoCommand(CollectionManager collectionManager) {
-        super("info", "Выводит информацию о коллекции", collectionManager);
-        this.collectionManager = collectionManager;
+    public InfoCommand(CollectionManager collectionManager, DatabaseHandler dbHandler) {
+        super(collectionManager, dbHandler);
+        this.name = "info";
+        this.description = "Выводит информацию о коллекции";
     }
 
     @Override

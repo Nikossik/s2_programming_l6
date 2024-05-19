@@ -94,4 +94,9 @@ public class Ticket implements Comparable<Ticket>, Serializable {
     public static void updateNextId(int nextIdValue) {
         nextId = nextIdValue;
     }
+
+    @Override
+    public String toString() {
+        return "Ticket(id=" + id + ", name=" + name + ", coordinates=" + coordinates + ", creationDate=" + creationDate + ", price=" + price + ", type=" + type + ", venue=" + venue + ", username=" + username + ")";
+    }
 }

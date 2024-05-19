@@ -1,19 +1,18 @@
 package ru.itmo.lab5.manager.commands;
 
 import ru.itmo.lab5.manager.CollectionManager;
+import ru.itmo.lab5.manager.DatabaseHandler;
 import ru.itmo.lab5.util.Task;
 
 /**
  * Команда для вывода справки по доступным командам.
  */
 public class HelpCommand extends Command {
-    /**
-     * Конструктор команды help.
-     *
-     * @param collectionManager Менеджер коллекции для взаимодействия с коллекцией.
-     */
-    public HelpCommand(CollectionManager collectionManager) {
-        super("help", "Выводит справку по доступным командам", collectionManager);
+
+    public HelpCommand(CollectionManager collectionManager, DatabaseHandler dbHandler) {
+        super(collectionManager, dbHandler);
+        this.name = "help";
+        this.description = "Выводит справку по доступным командам";
     }
 
     @Override

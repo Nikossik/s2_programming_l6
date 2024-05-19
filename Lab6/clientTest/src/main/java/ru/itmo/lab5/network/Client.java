@@ -7,11 +7,8 @@ import java.util.Arrays;
 import java.io.*;
 import java.net.*;
 import java.nio.channels.DatagramChannel;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Client {
-    private static final Logger logger = Logger.getLogger(Client.class.getName());
     private final int BUFFER_SIZE = 4096;
     private final SocketAddress serverAddress = new InetSocketAddress("localhost", 1488);
     private final DatagramChannel channel;
@@ -21,7 +18,6 @@ public class Client {
     }
 
     public boolean sendTask(Task task) throws IOException, ClassNotFoundException {
-        System.out.println(task.getTicket());
         byte[] fullData = serializeTask(task);
         sendData(fullData);
         return getResponse();

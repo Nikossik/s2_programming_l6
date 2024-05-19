@@ -1,7 +1,6 @@
 package ru.itmo.lab5.data.models;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 @Getter

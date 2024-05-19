@@ -2,6 +2,7 @@ package ru.itmo.lab5.manager.commands;
 
 import ru.itmo.lab5.manager.CollectionManager;
 import ru.itmo.lab5.data.models.Ticket;
+import ru.itmo.lab5.manager.DatabaseHandler;
 import ru.itmo.lab5.util.Task;
 
 import java.util.Optional;
@@ -10,16 +11,10 @@ import java.util.Optional;
  * Команда для обновления элемента коллекции с указанным ID.
  */
 public class UpdateIDCommand extends Command {
-    private final CollectionManager collectionManager;
-
-    /**
-     * Конструктор команды update_id.
-     *
-     * @param collectionManager Менеджер коллекции для взаимодействия с коллекцией.
-     */
-    public UpdateIDCommand(CollectionManager collectionManager) {
-        super("update_id <id>", "Обновляет значение элемента коллекции, ID которого равен заданному", collectionManager);
-        this.collectionManager = collectionManager;
+    public UpdateIDCommand(CollectionManager collectionManager, DatabaseHandler dbHandler) {
+        super(collectionManager, dbHandler);
+        this.name = "update_id <id>";
+        this.description = "Обновляет значение элемента коллекции, ID которого равен заданному";
     }
 
     @Override

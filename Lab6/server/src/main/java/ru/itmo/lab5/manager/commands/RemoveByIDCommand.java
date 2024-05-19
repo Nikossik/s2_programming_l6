@@ -1,22 +1,15 @@
 package ru.itmo.lab5.manager.commands;
 
 import ru.itmo.lab5.manager.CollectionManager;
+import ru.itmo.lab5.manager.DatabaseHandler;
 import ru.itmo.lab5.util.Task;
 
-/**
- * Команда для удаления элемента из коллекции по его ID.
- */
 public class RemoveByIDCommand extends Command {
-    private final CollectionManager collectionManager;
 
-    /**
-     * Конструктор команды remove_by_id.
-     *
-     * @param collectionManager Менеджер коллекции для взаимодействия с коллекцией.
-     */
-    public RemoveByIDCommand(CollectionManager collectionManager) {
-        super("remove_by_id <id>", "Удаляет элемент из коллекции по его ID", collectionManager);
-        this.collectionManager = collectionManager;
+    public RemoveByIDCommand(CollectionManager collectionManager, DatabaseHandler dbHandler) {
+        super(collectionManager, dbHandler);
+        this.name = "remove_by_id <id>";
+        this.description = "Удаляет элемент из коллекции по его ID";
     }
 
     @Override

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CommandInvoker {
-    private final Map<String, Command> commandMap = new HashMap<>();
+    private final Map<String, CommandFactory> commandMap = new HashMap<>();
     private final CollectionManager collectionManager;
     private final DatabaseHandler dbHandler;
 
@@ -18,33 +18,35 @@ public class CommandInvoker {
     }
 
     private void registerCommands() {
-        register("register", new RegisterCommand(dbHandler));
-        register("login", new LoginCommand(dbHandler));
-        register("add", new AddCommand(collectionManager));
-        register("clear", new ClearCommand(collectionManager));
-        register("info", new InfoCommand(collectionManager));
-        register("remove_at", new RemoveAtCommand(collectionManager));
-        register("remove_by_id", new RemoveByIDCommand(collectionManager));
-        register("remove_first", new RemoveFirstCommand(collectionManager));
-        register("show", new ShowCommand(collectionManager));
-        register("update_id", new UpdateIDCommand(collectionManager));
-        register("filter_less_than_venue", new FilterLessThanVenueCommand(collectionManager));
-        register("print_descending", new PrintDescendingCommand(collectionManager));
-        register("print_field_descending_venue", new PrintFieldDescendingVenueCommand(collectionManager));
-        register("help", new HelpCommand(collectionManager));
-        register("save", new SaveCommand(collectionManager));
+        register("add", AddCommand::new);
+        register("add_if_min", AddIfMinCommand::new);
+        register("register", RegisterCommand::new);
+        register("login", LoginCommand::new);
+        register("clear", ClearCommand::new);
+        register("filter_less_than_venue", FilterLessThanVenueCommand::new);
+        register("help", HelpCommand::new);
+        register("info", InfoCommand::new);
+        register("print_descending", PrintDescendingCommand::new);
+        register("print_field_descending_venue", PrintFieldDescendingVenueCommand::new);
+        register("remove_at", RemoveAtCommand::new);
+        register("remove_by_id", RemoveByIDCommand::new);
+        register("remove_first", RemoveFirstCommand::new);
+        register("save", SaveCommand::new);
+        register("show", ShowCommand::new);
+        register("update_id", UpdateIDCommand::new);
     }
 
-    public void register(String commandName, Command command) {
-        commandMap.put(commandName, command);
+    public void register(String commandName, CommandFactory commandFactory) {
+        commandMap.put(commandName, commandFactory);
     }
 
     public Task executeCommand(Task task) {
-        Command command = commandMap.get(task.getDescribe()[0]);
-        if (command != null) {
+        CommandFactory factory = commandMap.get(task.getDescribe()[0]);
+        if (factory != null) {
+            Command command = factory.create(collectionManager, dbHandler);
             return command.execute(task);
         } else {
-            return new Task(new String[]{"Неизвестная команда. Введите 'help' для помощи."});
+            return new Task(new String[]{"Unknown command. Enter 'help' for assistance."});
         }
     }
 }

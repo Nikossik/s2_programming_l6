@@ -2,6 +2,7 @@ package ru.itmo.lab5.manager.commands;
 
 import ru.itmo.lab5.data.models.Ticket;
 import ru.itmo.lab5.manager.CollectionManager;
+import ru.itmo.lab5.manager.DatabaseHandler;
 import ru.itmo.lab5.util.Task;
 
 import java.util.Comparator;
@@ -12,16 +13,11 @@ import java.util.stream.Collectors;
  * Команда для вывода элементов коллекции, чьи места проведения имеют вместимость меньше заданной.
  */
 public class FilterLessThanVenueCommand extends Command {
-    private final CollectionManager collectionManager;
 
-    /**
-     * Конструктор команды filter_less_than_venue.
-     *
-     * @param collectionManager Менеджер коллекции для взаимодействия с коллекцией.
-     */
-    public FilterLessThanVenueCommand(CollectionManager collectionManager) {
-        super("filter_less_than_venue <venue_capacity>", "Выводит элементы, значение поля venue которых меньше заданного", collectionManager);
-        this.collectionManager = collectionManager;
+    public FilterLessThanVenueCommand(CollectionManager collectionManager, DatabaseHandler dbHandler) {
+        super(collectionManager, dbHandler);
+        this.name = "filter_less_than_venue <venue>";
+        this.description = "Выводит элементы, значение поля venue которых меньше заданного";
     }
 
     @Override

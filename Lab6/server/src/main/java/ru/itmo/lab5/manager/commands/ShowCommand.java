@@ -2,22 +2,18 @@ package ru.itmo.lab5.manager.commands;
 
 import ru.itmo.lab5.manager.CollectionManager;
 import ru.itmo.lab5.data.models.Ticket;
+import ru.itmo.lab5.manager.DatabaseHandler;
 import ru.itmo.lab5.util.Task;
 
 /**
  * Команда для вывода всех элементов коллекции.
  */
 public class ShowCommand extends Command {
-    private final CollectionManager collectionManager;
 
-    /**
-     * Конструктор команды show.
-     *
-     * @param collectionManager Менеджер коллекции для взаимодействия с коллекцией.
-     */
-    public ShowCommand(CollectionManager collectionManager) {
-        super("show", "Выводит все элементы коллекции", collectionManager);
-        this.collectionManager = collectionManager;
+    public ShowCommand(CollectionManager collectionManager, DatabaseHandler dbHandler) {
+        super(collectionManager, dbHandler);
+        this.name = "show";
+        this.description = "Выводит все элементы коллекции";
     }
 
     @Override
@@ -25,17 +21,18 @@ public class ShowCommand extends Command {
         try {
             var tickets = collectionManager.getTickets();
             if (tickets.isEmpty()) {
-                return new Task(new String[]{"Коллекция пуста."});
+                return new Task(new String[]{"Collection is empty."});
             } else {
                 StringBuilder answer = new StringBuilder();
-                answer.append("Элементы коллекции:\n");
+                answer.append("Collection items:\n");
                 for (Ticket ticket : tickets) {
                     answer.append(ticket).append("\n");
                 }
                 return new Task(new String[]{answer.toString()});
             }
         } catch (Exception e) {
-            return new Task(new String[]{"Ошибка при получении билетов: " + e.getMessage()});
+            return new Task(new String[]{"Error retrieving tickets: " + e.getMessage()});
         }
     }
+
 }

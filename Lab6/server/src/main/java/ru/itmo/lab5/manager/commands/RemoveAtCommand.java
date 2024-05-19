@@ -1,22 +1,18 @@
 package ru.itmo.lab5.manager.commands;
 
 import ru.itmo.lab5.manager.CollectionManager;
+import ru.itmo.lab5.manager.DatabaseHandler;
 import ru.itmo.lab5.util.Task;
 
 /**
  * Команда для удаления элемента коллекции по указанному индексу.
  */
 public class RemoveAtCommand extends Command {
-    private final CollectionManager collectionManager;
 
-    /**
-     * Конструктор команды remove_at.
-     *
-     * @param collectionManager Менеджер коллекции для взаимодействия с коллекцией.
-     */
-    public RemoveAtCommand(CollectionManager collectionManager) {
-        super("remove_at <index>", "Удаляет элемент из коллекции по его индексу", collectionManager);
-        this.collectionManager = collectionManager;
+    public RemoveAtCommand(CollectionManager collectionManager, DatabaseHandler dbHandler) {
+        super(collectionManager, dbHandler);
+        this.name = "remove_at <index>";
+        this.description = "Удаляет элемент из коллекции по его индексу";
     }
 
     @Override

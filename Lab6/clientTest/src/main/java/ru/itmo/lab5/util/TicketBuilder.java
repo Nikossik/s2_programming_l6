@@ -13,20 +13,20 @@ public class TicketBuilder {
      *
      * @return Новый объект {@link Ticket} с заданными параметрами.
      */
-    public static Ticket buildTicket() {
+    public static Ticket buildTicket(String username) {
         String name = InputHelper.requestString("Введите имя билета: ", false);
         Coordinates coordinates = CoordinatesBuilder.build();
         long price = InputHelper.requestInt("Введите цену билета: ");
         TicketType type;
-        while(true) {
+        while (true) {
             try {
                 System.out.println("Доступные типы билетов: " + TicketType.names());
-                type = TicketType.valueOf(Objects.requireNonNull(InputHelper.requestString("Введите тип билета: ", true)).toUpperCase());
+                type = TicketType.valueOf(Objects.requireNonNull(InputHelper.requestString("Введите тип билета: ", false)).toUpperCase());
                 break;
             } catch (IllegalArgumentException e) {
-                System.out.println("Неверно указан тип. Доступны только: LOFT, OPEN_AREA, THEATRE, STADIUM.");
+                System.out.println("Неверно указан тип. Доступны только: VIP, USUAL, CHEAP.");
             }
         }
-        return new Ticket(name, coordinates, price, type, VenueBuilder.build());
+        return new Ticket(name, coordinates, price, type, VenueBuilder.build(), username);
     }
 }

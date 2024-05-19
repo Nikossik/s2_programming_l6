@@ -1,19 +1,15 @@
 package ru.itmo.lab5.manager.commands;
 
-import ru.itmo.lab5.manager.CollectionManager;
 import ru.itmo.lab5.data.models.Ticket;
+import ru.itmo.lab5.manager.CollectionManager;
+import ru.itmo.lab5.manager.DatabaseHandler;
 import ru.itmo.lab5.util.Task;
 
-/**
- * Command for adding a new ticket to the collection.
- */
 public class AddCommand extends Command {
-
-    private final CollectionManager collectionManager;
-
-    public AddCommand(CollectionManager collectionManager) {
-        super("add", "Adds a new ticket to the collection", collectionManager);
-        this.collectionManager = collectionManager;
+    public AddCommand(CollectionManager collectionManager, DatabaseHandler dbHandler) {
+        super(collectionManager, dbHandler);
+        this.name = "add";
+        this.description = "Adds an element to the collection";
     }
 
     @Override

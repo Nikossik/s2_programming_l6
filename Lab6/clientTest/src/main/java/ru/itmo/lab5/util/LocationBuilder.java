@@ -13,7 +13,7 @@ public class LocationBuilder {
         System.out.println("Создание локации.");
         int x = InputHelper.requestInt("Введите координату X локации: ");
         double y = InputHelper.requestDouble("Введите координату Y локации: ");
-        String name = InputHelper.requestString("Введите название локации (нажмите Enter для пропуска): ", true);
+        String name = InputHelper.requestString("Введите название локации: ", false);
         return new Location(x, y, name);
     }
 }

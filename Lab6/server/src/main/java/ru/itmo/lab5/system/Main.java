@@ -21,9 +21,6 @@ public class Main {
 
     public static void main(String[] args) {
         DatabaseHandler dbHandler = new DatabaseHandler();
-        CollectionManager collectionManager = new CollectionManager(dbHandler);
-
-        collectionManager.loadCollection();
 
         new Thread(() -> {
             try {
