@@ -8,23 +8,18 @@ import java.util.Objects;
 
 public class TicketBuilder {
 
-    /**
-     * Создает объект {@link Ticket}, запрашивая у пользователя необходимые данные.
-     *
-     * @return Новый объект {@link Ticket} с заданными параметрами.
-     */
     public static Ticket buildTicket(String username) {
-        String name = InputHelper.requestString("Введите имя билета: ", false);
+        String name = InputHelper.requestString("Enter the name of the ticket: ", false);
         Coordinates coordinates = CoordinatesBuilder.build();
-        long price = InputHelper.requestInt("Введите цену билета: ");
+        long price = InputHelper.requestInt("Enter the ticket price: ");
         TicketType type;
         while (true) {
             try {
-                System.out.println("Доступные типы билетов: " + TicketType.names());
-                type = TicketType.valueOf(Objects.requireNonNull(InputHelper.requestString("Введите тип билета: ", false)).toUpperCase());
+                System.out.println("Available ticket types: " + TicketType.names());
+                type = TicketType.valueOf(Objects.requireNonNull(InputHelper.requestString("Enter the ticket type: ", false)).toUpperCase());
                 break;
             } catch (IllegalArgumentException e) {
-                System.out.println("Неверно указан тип. Доступны только: VIP, USUAL, CHEAP.");
+                System.out.println("The type is specified incorrectly. Available only: VIP, USUAL, CHEAP.");
             }
         }
         return new Ticket(name, coordinates, price, type, VenueBuilder.build(), username);

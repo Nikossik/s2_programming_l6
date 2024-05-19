@@ -2,16 +2,16 @@ package ru.itmo.lab5.network;
 
 import ru.itmo.lab5.manager.CollectionManager;
 import ru.itmo.lab5.manager.CommandInvoker;
-import ru.itmo.lab5.manager.Console;
 import ru.itmo.lab5.manager.DatabaseHandler;
 import ru.itmo.lab5.util.Task;
 
-import java.util.concurrent.*;
 import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.TreeMap;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.nio.channels.DatagramChannel;
@@ -27,15 +27,16 @@ public class Server {
     private final ForkJoinPool receivePool = new ForkJoinPool();
     private final ForkJoinPool processPool = new ForkJoinPool();
     private final ExecutorService responsePool = Executors.newCachedThreadPool();
-    private final DatabaseHandler dbHandler;
     private final CollectionManager collectionManager;
+    private final CommandInvoker commandInvoker;
 
     public Server(DatabaseHandler dbHandler) throws IOException {
-        this.dbHandler = dbHandler;
         this.collectionManager = CollectionManager.getInstance(dbHandler);
+        this.commandInvoker = new CommandInvoker(collectionManager, dbHandler);
         channel = DatagramChannel.open();
         SocketAddress localAddress = new InetSocketAddress(1488);
         channel.bind(localAddress);
+        startConsoleInput();
     }
 
     public void runServer() {
@@ -61,7 +62,6 @@ public class Server {
 
             if (expectedTotalPackets == -1) {
                 expectedTotalPackets = totalPackets;
-                logger.info("Expected total packets: " + totalPackets);
             }
 
             if (!receivedPackets.containsKey(packetNumber)) {
@@ -74,10 +74,12 @@ public class Server {
                 processPool.execute(() -> {
                     try {
                         Task task = deserializeTask(completeData);
+                        if (task.getCollectionType() != null) {
+                            collectionManager.setCollectionType(task.getCollectionType());
+                        }
                         collectionManager.setCurrentUsername(task.getUsername());
-                        CommandInvoker commandInvoker = new CommandInvoker(collectionManager, dbHandler);
-                        Console console = new Console(commandInvoker);
-                        Task responseTask = console.start(task);
+                        logger.info("Executing: " + task.getDescribe()[0]);
+                        Task responseTask = commandInvoker.executeCommand(task);
                         responsePool.execute(() -> {
                             try {
                                 sendResponse(responseTask, remoteAddr);
@@ -126,5 +128,31 @@ public class Server {
         receivedPackets.clear();
         expectedTotalPackets = -1;
         lastReceivedPacket = -1;
+    }
+
+    private void startConsoleInput() {
+        new Thread(() -> {
+            Scanner scanner = new Scanner(System.in);
+            while (true) {
+                System.out.print("Server> ");
+                String input = scanner.nextLine().trim();
+                if ("exit".equalsIgnoreCase(input)) {
+                    System.exit(0);
+                } else if ("save".equalsIgnoreCase(input)) {
+                    String[] userCommand = new String[] { "save", "" };
+                    Task task = new Task();
+                    task.setDescribe(userCommand);
+                    task.setUsername("server");
+                    task.setPassword("");
+
+                    Task responseTask = commandInvoker.executeCommand(task);
+                    if (responseTask.getDescribe() != null && responseTask.getDescribe().length > 0) {
+                        System.out.println(responseTask.getDescribe()[0]);
+                    }
+                } else {
+                    System.out.println("Unknown command. Only 'save' command is allowed.");
+                }
+            }
+        }).start();
     }
 }

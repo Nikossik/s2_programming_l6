@@ -4,16 +4,11 @@ import ru.itmo.lab5.data.models.Location;
 
 public class LocationBuilder {
 
-    /**
-     * Создает объект {@link Location}, запрашивая у пользователя координаты и название локации.
-     *
-     * @return Новый объект {@link Location} с заданными параметрами.
-     */
     public static Location build() {
-        System.out.println("Создание локации.");
-        int x = InputHelper.requestInt("Введите координату X локации: ");
-        double y = InputHelper.requestDouble("Введите координату Y локации: ");
-        String name = InputHelper.requestString("Введите название локации: ", false);
+        System.out.println("Creating a location.");
+        int x = InputHelper.requestInt("Enter the X coordinate of the location: ");
+        double y = InputHelper.requestDouble("Enter the Y coordinate of the location: ");
+        String name = InputHelper.requestString("Enter the name of the location: ", false);
         return new Location(x, y, name);
     }
 }

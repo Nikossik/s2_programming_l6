@@ -8,7 +8,7 @@ public class ClearCommand extends Command {
     public ClearCommand(CollectionManager collectionManager, DatabaseHandler dbHandler) {
         super(collectionManager, dbHandler);
         this.name = "clear";
-        this.description = "Очищает коллекцию";
+        this.description = "Clear the collection";
     }
 
     @Override

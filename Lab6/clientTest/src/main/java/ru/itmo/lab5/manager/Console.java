@@ -17,12 +17,10 @@ public class Console {
     private static final Logger logger = Logger.getLogger(Console.class.getName());
     private String username;
     private String password;
-    private final Execute_script executeScript;
 
     public Console(Client client) throws IOException {
         this.scanner = new Scanner(System.in);
         this.client = new Client();
-        this.executeScript = new Execute_script();
     }
 
     public void start() {
@@ -32,12 +30,17 @@ public class Console {
                 System.out.println("Failed to log in or register. Please try again.");
             }
 
+            System.out.println("Enter collection type (ArrayList/HashMap/ArrayDeque)");
+            System.out.print("Type (1/2/3): ");
+            String collectionType = scanner.nextLine().trim();
+
             System.out.println("Enter 'help' for a list of commands.");
             String[] userCommand;
             while (true) {
                 Task task = new Task();
                 task.setUsername(this.username);
                 task.setPassword(this.password);
+                task.setCollectionType(collectionType);
                 System.out.print("> ");
                 if (!scanner.hasNextLine()) {
                     break;
@@ -48,13 +51,17 @@ public class Console {
                 if ("exit".equalsIgnoreCase(userCommand[0])) {
                     System.exit(0);
                 }
+                if ("save".equalsIgnoreCase(userCommand[0])) {
+                    System.out.println("Error: 'save' command is not allowed for users.");
+                    continue;
+                }
                 task.setDescribe(userCommand);
                 if ("add".equalsIgnoreCase(userCommand[0]) || "add_if_min".equalsIgnoreCase(userCommand[0]) || "update_id".equalsIgnoreCase(userCommand[0])) {
                     task.setTicket(TicketBuilder.buildTicket(username));
                 }
                 try {
                     if ("execute_script".equalsIgnoreCase(userCommand[0])) {
-                        executeScript.readScript(userCommand[1], client, username);
+                        Execute_script.readScript(userCommand[1], client, username);
                     } else {
                         client.sendTask(task);
                     }

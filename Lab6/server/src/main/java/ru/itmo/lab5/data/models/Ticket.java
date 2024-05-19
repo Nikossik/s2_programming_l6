@@ -8,10 +8,6 @@ import lombok.*;
 import java.io.Serializable;
 import java.util.Date;
 
-/**
- * Класс Ticket представляет билет, связанный с определенным событием или местоположением.
- * Билет имеет уникальный идентификатор, название, координаты места, дату создания, цену, тип и место проведения.
- */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
@@ -20,25 +16,17 @@ import java.util.Date;
 @Getter
 @Setter
 public class Ticket implements Comparable<Ticket>, Serializable {
-    private static int nextId = 0;
-    private int id; // Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
-    private String name; // Поле не может быть null, Строка не может быть пустой
-    private Coordinates coordinates; // Поле не может быть null
-    private Date creationDate; // Поле не может быть null, Значение этого поля должно генерироваться автоматически
-    private Long price; // Поле может быть null, Значение поля должно быть больше 0
-    private TicketType type; // Поле может быть null
-    private Venue venue; // Поле может быть null
+    @Getter
+    private static int nextId = 1;
+    private int id;
+    private String name;
+    private Coordinates coordinates;
+    private Date creationDate;
+    private Long price;
+    private TicketType type;
+    private Venue venue;
     private String username;
 
-    /**
-     * Создает новый экземпляр билета с указанными параметрами.
-     *
-     * @param name        Название билета.
-     * @param coordinates Координаты места.
-     * @param price       Цена билета.
-     * @param type        Тип билета.
-     * @param venue       Место проведения.
-     */
     public Ticket(String name, Coordinates coordinates, Long price, TicketType type, Venue venue, String username) {
         this.id = ++nextId;
         this.name = name;
@@ -50,26 +38,12 @@ public class Ticket implements Comparable<Ticket>, Serializable {
         this.username = username;
     }
 
-    /**
-     * Проверяет валидность билета.
-     * Билет считается валидным, если все его поля, кроме цены, типа и места проведения, заданы корректно.
-     *
-     * @return true, если билет валиден, иначе false.
-     */
     public boolean validate() {
         if (name == null || name.isEmpty()) return false;
         if (coordinates == null || !coordinates.validate()) return false;
         return price == null || price > 0;
     }
 
-    /**
-     * Сравнивает этот билет с другим билетом для упорядочения.
-     * Сравнение производится сначала по цене, затем — по дате создания.
-     *
-     * @param o Другой объект билета для сравнения.
-     * @return Отрицательное целое число, ноль или положительное целое число,
-     * если этот билет меньше, равен или больше указанного объекта.
-     */
     @Override
     public int compareTo(Ticket o) {
         if (this.price != null && o.price != null) {
@@ -85,12 +59,6 @@ public class Ticket implements Comparable<Ticket>, Serializable {
         return this.creationDate.compareTo(o.creationDate);
     }
 
-    /**
-     * Обновляет статический счетчик ID для билетов на указанное значение.
-     * Это может быть использовано для синхронизации счетчика с внешним источником данных.
-     *
-     * @param nextIdValue Новое значение для счетчика ID билетов.
-     */
     public static void updateNextId(int nextIdValue) {
         nextId = nextIdValue;
     }

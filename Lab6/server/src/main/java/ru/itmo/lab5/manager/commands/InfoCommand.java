@@ -6,15 +6,12 @@ import ru.itmo.lab5.util.Task;
 
 import java.time.format.DateTimeFormatter;
 
-/**
- * Команда для вывода информации о коллекции билетов.
- */
 public class InfoCommand extends Command {
 
     public InfoCommand(CollectionManager collectionManager, DatabaseHandler dbHandler) {
         super(collectionManager, dbHandler);
         this.name = "info";
-        this.description = "Выводит информацию о коллекции";
+        this.description = "Displays information about the collection";
     }
 
     @Override
@@ -22,18 +19,18 @@ public class InfoCommand extends Command {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
         String answer = "";
-        answer = answer + "информация о коллекции:\n";
+        answer = answer + "information about the collection:\n";
 
         int ticketCount = collectionManager.getTickets().size();
-        answer = answer + "Количество элементов: " + ticketCount + "\n";
+        answer = answer + "Number of elements: " + ticketCount + "\n";
 
         String initializationDate = collectionManager.getInitializationDate().format(formatter);
-        answer = answer + "Дата инициализации коллекции: " + initializationDate + "\n";
+        answer = answer + "Date of collection initialization: " + initializationDate + "\n";
 
         String lastSaveTime = collectionManager.getLastSaveTime() != null
                 ? collectionManager.getLastSaveTime().format(formatter)
-                : "Коллекция ещё не сохранялась.";
-        answer = answer + "Дата последнего сохранения: " + lastSaveTime + "\n";
+                : "The collection has not been saved yet.";
+        answer = answer + "Date of last save: " + lastSaveTime + "\n";
 
         return new Task(new String[]{answer});
     }

@@ -1,8 +1,4 @@
 package ru.itmo.lab5.system;
-
-import ru.itmo.lab5.manager.CollectionManager;
-import ru.itmo.lab5.manager.CommandInvoker;
-import ru.itmo.lab5.manager.Console;
 import ru.itmo.lab5.manager.DatabaseHandler;
 import ru.itmo.lab5.network.Server;
 import sun.misc.Signal;

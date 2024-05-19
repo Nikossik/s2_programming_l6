@@ -15,7 +15,7 @@ public class LoginCommand extends Command {
     @Override
     public Task execute(Task task) {
         try {
-            boolean loginSuccess = dbHandler.checkUserPassword(task.getUsername(), task.getPassword());
+            boolean loginSuccess = DatabaseHandler.checkUserPassword(task.getUsername(), task.getPassword());
             if (loginSuccess) {
                 return new Task(new String[]{"Login successful."});
             } else {

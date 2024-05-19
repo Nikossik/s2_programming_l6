@@ -7,23 +7,18 @@ import ru.itmo.lab5.data.models.VenueType;
 import java.util.Objects;
 
 public class VenueBuilder {
-    /**
-     * Создает объект {@link Venue}, запрашивая у пользователя необходимые данные.
-     *
-     * @return Новый объект {@link Venue} с заданными параметрами.
-     */
     public static Venue build() {
-        System.out.println("Создание места проведения.");
-        String name = InputHelper.requestString("Введите имя места проведения: ", false);
-        int capacity = InputHelper.requestInt("Введите вместимость: ");
+        System.out.println("Creating a venue.");
+        String name = InputHelper.requestString("Enter the name of the venue: ", false);
+        int capacity = InputHelper.requestInt("Enter the capacity: ");
         VenueType type;
         while(true) {
             try {
-                System.out.println("Доступные типы мест: " + VenueType.names());
-                type = VenueType.valueOf(Objects.requireNonNull(InputHelper.requestString("Введите тип места проведения: ", true)).toUpperCase());
+                System.out.println("Available types of seats: " + VenueType.names());
+                type = VenueType.valueOf(Objects.requireNonNull(InputHelper.requestString("Enter the type of venue: ", true)).toUpperCase());
                 break;
             } catch (IllegalArgumentException e) {
-                System.out.println("Неверно указан тип. Доступны только: LOFT, OPEN_AREA, THEATRE, STADIUM.");
+                System.out.println("The type is specified incorrectly. Available only: LOFT, OPEN_AREA, THEATRE, STADIUM.");
             }
         }
         Address address = AddressBuilder.build();

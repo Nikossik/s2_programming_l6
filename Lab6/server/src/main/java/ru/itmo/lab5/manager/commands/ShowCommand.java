@@ -13,7 +13,7 @@ public class ShowCommand extends Command {
     public ShowCommand(CollectionManager collectionManager, DatabaseHandler dbHandler) {
         super(collectionManager, dbHandler);
         this.name = "show";
-        this.description = "Выводит все элементы коллекции";
+        this.description = "List all tickets";
     }
 
     @Override

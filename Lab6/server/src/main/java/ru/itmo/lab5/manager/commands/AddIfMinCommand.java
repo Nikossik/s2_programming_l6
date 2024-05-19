@@ -11,14 +11,14 @@ public class AddIfMinCommand extends Command {
     public AddIfMinCommand(CollectionManager collectionManager, DatabaseHandler dbHandler) {
         super(collectionManager, dbHandler);
         this.name = "add_if_min";
-        this.description = "Добавляет новый элемент в коллекцию, если его значение меньше, чем у наименьшего элемента этой коллекции";
+        this.description = "Add new ticket to the collection if it is less than min";
     }
 
     @Override
     public Task execute(Task task) {
         Ticket newTicket = task.getTicket();
         if (newTicket == null) {
-            return new Task(new String[]{"Не удалось создать билет. Отмена операции."});
+            return new Task(new String[]{"Unable to create new ticket."});
         }
 
         Ticket minTicket = collectionManager.getTickets().stream()
@@ -28,12 +28,12 @@ public class AddIfMinCommand extends Command {
         if (minTicket == null || newTicket.getPrice() < minTicket.getPrice()) {
             boolean added = collectionManager.add(newTicket);
             if (added) {
-                return new Task(new String[]{"Новый билет успешно добавлен в коллекцию."});
+                return new Task(new String[]{"New ticket added."});
             } else {
-                return new Task(new String[]{"Ошибка при добавлении билета в коллекцию."});
+                return new Task(new String[]{"Error adding new ticket."});
             }
         } else {
-            return new Task(new String[]{"Новый билет не является минимальным. Операция добавления не выполнена."});
+            return new Task(new String[]{"New ticket is not less than min."});
         }
     }
 }

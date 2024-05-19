@@ -117,9 +117,14 @@ public class DatabaseHandler {
     }
 
     public static boolean checkUserPassword(String username, String password) throws UserException {
+        if (username == null || password == null) {
+            throw new UserException("Username or password cannot be null");
+        }
+
         if (!checkUserPresence(username)) {
             throw new UserException("User does not exist");
         }
+
         String selectUserQuery = "SELECT password FROM users WHERE username = ?";
         try (Connection connection = getConnection();
              PreparedStatement stmt = connection.prepareStatement(selectUserQuery)) {
@@ -151,15 +156,26 @@ public class DatabaseHandler {
         }
     }
 
-    public boolean clearTickets() {
-        String clearTicketsQuery = "DELETE FROM tickets;";
+    public static boolean removeAllUserTickets(String username) {
+        String removeAllTicketsQuery = "DELETE FROM tickets WHERE username = ?";
         try (Connection connection = getConnection();
-             PreparedStatement stmt = connection.prepareStatement(clearTicketsQuery)) {
-            stmt.executeUpdate();
+             PreparedStatement stmt = connection.prepareStatement(removeAllTicketsQuery)) {
+            stmt.setString(1, username);
+            stmt.execute();
             return true;
         } catch (SQLException e) {
             logger.log(Level.SEVERE, e.getMessage());
             return false;
+        }
+    }
+
+    public void clearTickets() {
+        String clearTicketsQuery = "DELETE FROM tickets;";
+        try (Connection connection = getConnection();
+             PreparedStatement stmt = connection.prepareStatement(clearTicketsQuery)) {
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, e.getMessage());
         }
     }
 

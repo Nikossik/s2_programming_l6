@@ -31,8 +31,8 @@ public class CommandInvoker {
         register("remove_at", RemoveAtCommand::new);
         register("remove_by_id", RemoveByIDCommand::new);
         register("remove_first", RemoveFirstCommand::new);
-        register("save", SaveCommand::new);
         register("show", ShowCommand::new);
+        register("save", SaveCommand::new);
         register("update_id", UpdateIDCommand::new);
     }
 

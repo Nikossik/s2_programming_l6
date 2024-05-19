@@ -7,29 +7,25 @@ import ru.itmo.lab5.util.Task;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
-/**
- * Команда для вывода элементов коллекции в порядке убывания цены.
- */
 public class PrintDescendingCommand extends Command {
 
     public PrintDescendingCommand(CollectionManager collectionManager, DatabaseHandler dbHandler) {
         super(collectionManager, dbHandler);
         this.name = "print_descending";
-        this.description = "Выводит элементы коллекции в порядке убывания";
+        this.description = "Displays the elements of the collection in descending order";
     }
 
     @Override
     public Task execute(Task task) {
         List<Ticket> sortedTickets = collectionManager.getTickets().stream()
                 .sorted(Comparator.comparing(Ticket::getPrice).reversed())
-                .collect(Collectors.toList());
+                .toList();
 
         if (sortedTickets.isEmpty()) {
-            return new Task(new String[]{"Коллекция пуста."});
+            return new Task(new String[]{"The collection is empty."});
         } else {
-            StringBuilder answer = new StringBuilder("Коллекция выведена в порядке убывания:\n");
+            StringBuilder answer = new StringBuilder("The collection is displayed in descending order:\n");
             sortedTickets.forEach(ticket -> answer.append(ticket).append("\n"));
             return new Task(new String[]{answer.toString()});
         }

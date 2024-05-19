@@ -7,7 +7,6 @@ import ru.itmo.lab5.util.Task;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PrintFieldDescendingVenueCommand extends Command {
 
@@ -15,7 +14,7 @@ public class PrintFieldDescendingVenueCommand extends Command {
     public PrintFieldDescendingVenueCommand(CollectionManager collectionManager, DatabaseHandler dbHandler) {
         super(collectionManager, dbHandler);
         this.name = "print_field_descending_venue";
-        this.description = "Выводит значения поля venue всех элементов в порядке убывания";
+        this.description = "Outputs the values of the venue field of all elements in descending order";
     }
 
     @Override
@@ -23,12 +22,12 @@ public class PrintFieldDescendingVenueCommand extends Command {
         List<Ticket> tickets = collectionManager.getTickets().stream()
                 .filter(ticket -> ticket.getVenue() != null)
                 .sorted(Comparator.comparingInt(ticket -> -ticket.getVenue().getCapacity()))
-                .collect(Collectors.toList());
+                .toList();
 
         if (tickets.isEmpty()) {
-            return new Task(new String[]{"В коллекции нет элементов с заданным полем venue или коллекция пуста."});
+            return new Task(new String[]{"There are no items in the collection with the specified venue field or the collection is empty."});
         } else {
-            StringBuilder answer = new StringBuilder("Значения поля venue всех элементов в порядке убывания:\n");
+            StringBuilder answer = new StringBuilder("The values of the venue field of all elements are in descending order:\n");
             tickets.forEach(ticket -> answer.append(ticket.getVenue()).append("\n"));
             return new Task(new String[]{answer.toString()});
         }

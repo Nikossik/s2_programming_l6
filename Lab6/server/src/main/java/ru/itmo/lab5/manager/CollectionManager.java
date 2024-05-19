@@ -6,7 +6,7 @@ import ru.itmo.lab5.data.models.Ticket;
 import ru.itmo.lab5.data.models.Venue;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -16,11 +16,13 @@ import java.util.logging.Logger;
 @Setter
 public class CollectionManager {
     private static CollectionManager instance;
-    private final ArrayList<Ticket> tickets;
+    private Collection<Ticket> collection;
     private final LocalDateTime initializationDate;
     private LocalDateTime lastSaveTime;
     private final DatabaseHandler dbHandler;
     private String currentUsername;
+
+    private boolean collectionTypeSet = false;
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final Lock readLock = lock.readLock();
@@ -28,14 +30,9 @@ public class CollectionManager {
     private static final Logger logger = Logger.getLogger("logger");
 
     private CollectionManager(DatabaseHandler dbHandler) {
-        this.tickets = new ArrayList<>();
+        this.dbHandler = dbHandler;
         this.initializationDate = LocalDateTime.now();
         this.lastSaveTime = LocalDateTime.now();
-        this.dbHandler = dbHandler;
-
-        clearAll();
-        loadCollection();
-        updateNextId();
     }
 
     public static synchronized CollectionManager getInstance(DatabaseHandler dbHandler) {
@@ -45,105 +42,28 @@ public class CollectionManager {
         return instance;
     }
 
-    public ArrayList<Ticket> getTickets() {
-        readLock.lock();
-        try {
-            return new ArrayList<>(tickets);
-        } finally {
-            readLock.unlock();
-        }
-    }
-
-    public void clearAll() {
+    public void setCollectionType(String type) {
         writeLock.lock();
         try {
-            tickets.clear();
-        } finally {
-            writeLock.unlock();
-        }
-    }
-
-    public void addFromDB(Ticket ticket) {
-        writeLock.lock();
-        try {
-            logger.info("Added ticket: " + ticket + ", username: " + ticket.getUsername());
-
-            tickets.add(ticket);
-        } finally {
-            writeLock.unlock();
-        }
-    }
-
-    public boolean add(Ticket ticket) {
-        writeLock.lock();
-        try {
-            ticket.setUsername(currentUsername);
-
-            return tickets.add(ticket);
-        } finally {
-            writeLock.unlock();
-        }
-    }
-
-    public void update(Ticket newTicket) {
-        writeLock.lock();
-        try {
-            for (int i = 0; i < tickets.size(); i++) {
-                if (tickets.get(i).getId() == newTicket.getId()) {
-                    tickets.set(i, newTicket);
-                    return;
-                }
+            if (collectionTypeSet) {
+                return;
             }
-        } finally {
-            writeLock.unlock();
-        }
-    }
-
-    public boolean remove(long id) {
-        writeLock.lock();
-        try {
-            return tickets.removeIf(ticket -> ticket.getId() == id && ticket.getUsername().equals(currentUsername));
-        } finally {
-            writeLock.unlock();
-        }
-    }
-
-    public boolean removeFirst() {
-        writeLock.lock();
-        try {
-            if (!tickets.isEmpty() && tickets.get(0).getUsername().equals(currentUsername)) {
-                tickets.remove(0);
-                return true;
+            switch (type) {
+                case "1":
+                    this.collection = new ArrayList<>();
+                    break;
+                case "2":
+                    this.collection = new HashSet<>(new HashMap<Integer, Ticket>().values());
+                    break;
+                case "3":
+                    this.collection = new ArrayDeque<>();
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown collection type: " + type);
             }
-            return false;
-        } finally {
-            writeLock.unlock();
-        }
-    }
-
-    @Override
-    public String toString() {
-        readLock.lock();
-        try {
-            StringBuilder sb = new StringBuilder("TicketCollection{");
-            for (Ticket ticket : tickets) {
-                sb.append("\n").append(ticket.toString());
-            }
-            sb.append("\n}");
-            return sb.toString();
-        } finally {
-            readLock.unlock();
-        }
-    }
-
-    public boolean removeAt(int index) {
-        writeLock.lock();
-        try {
-            if (index >= 0 && index < tickets.size() && tickets.get(index).getUsername().equals(currentUsername)) {
-                tickets.remove(index);
-                return true;
-            }
-            return false;
+            loadCollection();
+            updateNextId();
+            collectionTypeSet = true;
         } finally {
             writeLock.unlock();
         }
@@ -152,12 +72,12 @@ public class CollectionManager {
     public void updateNextId() {
         writeLock.lock();
         try {
-            int maxTicketId = tickets.stream()
+            int maxTicketId = collection.stream()
                     .mapToInt(Ticket::getId)
                     .max()
                     .orElse(0);
 
-            long maxVenueId = tickets.stream()
+            long maxVenueId = collection.stream()
                     .filter(ticket -> ticket.getVenue() != null)
                     .mapToLong(ticket -> ticket.getVenue().getId())
                     .max()
@@ -167,6 +87,112 @@ public class CollectionManager {
 
             Ticket.updateNextId((int) nextId);
             Venue.updateNextId(nextId);
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    public boolean removeAt(int index) {
+        writeLock.lock();
+        try {
+            if (collection instanceof List<Ticket> list) {
+                if (index >= 0 && index < list.size() && list.get(index).getUsername().equals(currentUsername)) {
+                    list.remove(index);
+                    updateNextId();
+                    return true;
+                }
+            }
+            return false;
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    public boolean removeFirst() {
+        writeLock.lock();
+        try {
+            if (!collection.isEmpty() && collection instanceof Queue<Ticket> queue) {
+                Ticket firstTicket = queue.peek();
+                if (firstTicket != null && firstTicket.getUsername().equals(currentUsername)) {
+                    queue.poll();
+                    updateNextId();
+                    return true;
+                }
+            }
+            return false;
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    public void update(Ticket newTicket) {
+        writeLock.lock();
+        try {
+            if (collection instanceof List<Ticket> list) {
+                for (int i = 0; i < list.size(); i++) {
+                    if (list.get(i).getId() == newTicket.getId()) {
+                        list.set(i, newTicket);
+                        return;
+                    }
+                }
+            } else if (collection instanceof Set) {
+                collection.remove(newTicket);
+                collection.add(newTicket);
+            } else if (collection instanceof Queue<Ticket> queue) {
+                queue.removeIf(ticket -> ticket.getId() == newTicket.getId());
+                queue.add(newTicket);
+            }
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    public Collection<Ticket> getTickets() {
+        readLock.lock();
+        try {
+            return new ArrayList<>(collection);
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+    public void clearAll() {
+        writeLock.lock();
+        try {
+            collection.clear();
+            updateNextId();
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    public void addFromDB(Ticket ticket) {
+        writeLock.lock();
+        try {
+            collection.add(ticket);
+            logger.info("Added ticket: " + ticket + ", username: " + ticket.getUsername());
+            updateNextId();
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    public boolean add(Ticket ticket) {
+        writeLock.lock();
+        try {
+            updateNextId();
+            ticket.setId(Ticket.getNextId());
+            ticket.setUsername(currentUsername);
+            return collection.add(ticket);
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    public boolean remove(long id) {
+        writeLock.lock();
+        try {
+            return collection.removeIf(ticket -> ticket.getId() == id && ticket.getUsername().equals(currentUsername));
         } finally {
             writeLock.unlock();
         }
@@ -193,6 +219,7 @@ public class CollectionManager {
     public void loadCollection() {
         writeLock.lock();
         try {
+            clearAll();
             dbHandler.loadAllTicketsToMemory(this);
         } finally {
             writeLock.unlock();
@@ -202,7 +229,8 @@ public class CollectionManager {
     public void clear(String currentUsername) {
         writeLock.lock();
         try {
-            tickets.removeIf(ticket -> ticket.getUsername().equals(currentUsername));
+            collection.removeIf(ticket -> ticket.getUsername().equals(currentUsername));
+            updateNextId();
         } finally {
             writeLock.unlock();
         }
@@ -211,7 +239,7 @@ public class CollectionManager {
     public Ticket getTicketById(long id) {
         readLock.lock();
         try {
-            return tickets.stream()
+            return collection.stream()
                     .filter(ticket -> ticket.getId() == id)
                     .findFirst()
                     .orElse(null);
@@ -220,22 +248,18 @@ public class CollectionManager {
         }
     }
 
-
-    public LocalDateTime getLastSaveTime() {
+    @Override
+    public String toString() {
         readLock.lock();
         try {
-            return lastSaveTime;
+            StringBuilder sb = new StringBuilder("TicketCollection{");
+            for (Ticket ticket : collection) {
+                sb.append("\n").append(ticket.toString());
+            }
+            sb.append("\n}");
+            return sb.toString();
         } finally {
             readLock.unlock();
-        }
-    }
-
-    public void setLastSaveTime(LocalDateTime lastSaveTime) {
-        writeLock.lock();
-        try {
-            this.lastSaveTime = lastSaveTime;
-        } finally {
-            writeLock.unlock();
         }
     }
 }

@@ -10,9 +10,9 @@ import java.util.Scanner;
 import java.util.Objects;
 
 public class Execute_script {
-    private final ArrayList<String> listOfPaths = new ArrayList<>();
+    private static final ArrayList<String> listOfPaths = new ArrayList<>();
 
-    public void readScript(String path, Client client, String username) throws IOException, ClassNotFoundException {
+    public static void readScript(String path, Client client, String username) throws IOException, ClassNotFoundException {
         try (FileReader fileReader = new FileReader(path)) {
             Scanner scanner = new Scanner(fileReader);
             String[] commandComponents;

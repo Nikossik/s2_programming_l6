@@ -15,7 +15,7 @@ public class RegisterCommand extends Command {
     @Override
     public Task execute(Task task) {
         try {
-            dbHandler.createUser(task.getUsername(), task.getPassword());
+            DatabaseHandler.createUser(task.getUsername(), task.getPassword());
             return new Task(new String[]{"Registration successful."});
         } catch (Exception e) {
             return new Task(new String[]{"Error during registration: " + e.getMessage()});

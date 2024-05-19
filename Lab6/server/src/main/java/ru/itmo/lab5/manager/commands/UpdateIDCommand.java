@@ -20,7 +20,7 @@ public class UpdateIDCommand extends Command {
     @Override
     public Task execute(Task task) {
         if (task.getDescribe().length < 2 || task.getDescribe()[1].isEmpty()) {
-            return new Task(new String[]{"спользование: '" + task.describe[0] + "'"});
+            return new Task(new String[]{"спользование: '" + task.getDescribe()[0] + "'"});
         }
         long id;
         try {
