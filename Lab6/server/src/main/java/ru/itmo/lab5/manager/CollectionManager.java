@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.itmo.lab5.data.models.Ticket;
 import ru.itmo.lab5.data.models.Venue;
+import ru.itmo.lab5.exceptions.CollectionOperationException;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -101,6 +102,12 @@ public class CollectionManager {
                     updateNextId();
                     return true;
                 }
+            } else if (collection instanceof Set) {
+                throw new UnsupportedOperationException("Remove at index is not supported for Set.");
+            } else if (collection instanceof Queue) {
+                throw new UnsupportedOperationException("Remove at index is not supported for Queue.");
+            } else {
+                throw new IllegalStateException("Unknown collection type.");
             }
             return false;
         } finally {
@@ -111,19 +118,33 @@ public class CollectionManager {
     public boolean removeFirst() {
         writeLock.lock();
         try {
-            if (!collection.isEmpty() && collection instanceof Queue<Ticket> queue) {
+            if (collection instanceof Queue<Ticket> queue) {
                 Ticket firstTicket = queue.peek();
                 if (firstTicket != null && firstTicket.getUsername().equals(currentUsername)) {
                     queue.poll();
                     updateNextId();
                     return true;
+                } else {
+                    throw new CollectionOperationException("First item not found or unauthorized access.");
                 }
+            } else if (collection instanceof List<Ticket> list) {
+                if (!list.isEmpty() && list.get(0).getUsername().equals(currentUsername)) {
+                    list.remove(0);
+                    updateNextId();
+                    return true;
+                } else {
+                    throw new CollectionOperationException("First item not found or unauthorized access.");
+                }
+            } else if (collection instanceof Set) {
+                throw new CollectionOperationException("Remove first is not supported for Set.");
+            } else {
+                throw new CollectionOperationException("Unknown collection type.");
             }
-            return false;
         } finally {
             writeLock.unlock();
         }
     }
+
 
     public void update(Ticket newTicket) {
         writeLock.lock();

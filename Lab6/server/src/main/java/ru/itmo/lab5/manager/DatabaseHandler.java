@@ -156,19 +156,6 @@ public class DatabaseHandler {
         }
     }
 
-    public static boolean removeAllUserTickets(String username) {
-        String removeAllTicketsQuery = "DELETE FROM tickets WHERE username = ?";
-        try (Connection connection = getConnection();
-             PreparedStatement stmt = connection.prepareStatement(removeAllTicketsQuery)) {
-            stmt.setString(1, username);
-            stmt.execute();
-            return true;
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, e.getMessage());
-            return false;
-        }
-    }
-
     public void clearTickets() {
         String clearTicketsQuery = "DELETE FROM tickets;";
         try (Connection connection = getConnection();
