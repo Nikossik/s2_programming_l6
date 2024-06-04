@@ -54,7 +54,7 @@ public class CollectionManager {
                     this.collection = new ArrayList<>();
                     break;
                 case "2":
-                    this.collection = new HashSet<>(new HashMap<Integer, Ticket>().values());
+                    this.collection = new HashSet<>();
                     break;
                 case "3":
                     this.collection = new ArrayDeque<>();
