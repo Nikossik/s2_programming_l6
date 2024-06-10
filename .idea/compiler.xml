@@ -8,14 +8,26 @@
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.24/13a394eed5c4f9efb2a6d956e2086f1d81e857d9/lombok-1.18.24.jar" />
         </processorPath>
         <module name="untitled8.server.main" />
+        <module name="untitled8.server.test" />
+      </profile>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.32/17d46b3e205515e1e8efd3ee4d57ce8018914163/lombok-1.18.32.jar" />
+        </processorPath>
         <module name="untitled8.clientTest.main" />
         <module name="untitled8.clientTest.test" />
-        <module name="untitled8.server.test" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="lab6.clientTest" target="19" />
       <module name="lab6.server" target="19" />
+      <module name="untitled8.clientTest" target="17" />
+      <module name="untitled8.clientTest.main" target="17" />
+      <module name="untitled8.clientTest.test" target="17" />
+      <module name="untitled8.server" target="17" />
+      <module name="untitled8.server.main" target="17" />
+      <module name="untitled8.server.test" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>

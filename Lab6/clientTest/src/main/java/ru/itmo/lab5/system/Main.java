@@ -1,7 +1,6 @@
 package ru.itmo.lab5.system;
 
-import ru.itmo.lab5.manager.Console;
-import ru.itmo.lab5.network.Client;
+import ru.itmo.lab5.app.App;
 import sun.misc.Signal;
 
 import java.io.IOException;
@@ -17,10 +16,12 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-        Console console = new Console(new Client());
-
-        console.start();
-        setSignalProcessing(
-                "INT", "TERM", "TSTP", "BREAK", "EOF");
+        App.launch(App.class,args);
     }
+//        Console console = new Console(new Client());
+//
+//        console.start();
+//        setSignalProcessing(
+//                "INT", "TERM", "TSTP", "BREAK", "EOF");
+//    }
 }

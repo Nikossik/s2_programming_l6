@@ -14,9 +14,15 @@ public class Task implements Serializable {
     private String username;
     private String password;
     private String collectionType;
+    private boolean status;
 
     public Task(String[] describe) {
         this.describe = describe;
+    }
+
+    public Task(String[] describe, boolean status) {
+        this.describe = describe;
+        this.status = status;
     }
 
     public Task() {

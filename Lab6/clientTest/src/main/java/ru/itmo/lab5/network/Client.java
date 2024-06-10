@@ -2,14 +2,14 @@ package ru.itmo.lab5.network;
 
 import ru.itmo.lab5.util.Task;
 
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.io.*;
 import java.net.*;
+import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
+import java.util.Arrays;
 
 public class Client {
-    private final int BUFFER_SIZE = 4096;
+    private final int BUFFER_SIZE = 60000;
     private final SocketAddress serverAddress = new InetSocketAddress("localhost", 1488);
     private final DatagramChannel channel;
 
@@ -17,10 +17,15 @@ public class Client {
         channel = DatagramChannel.open();
     }
 
-    public boolean sendTask(Task task) throws IOException, ClassNotFoundException {
+    public Task sendTask(Task task) throws IOException, ClassNotFoundException {
+        System.out.println("Serializing task...");
         byte[] fullData = serializeTask(task);
+        System.out.println("Sending data...");
         sendData(fullData);
-        return getResponse();
+        System.out.println("Receiving response...");
+        Task response = getResponse();
+        System.out.println("Received response");
+        return response;
     }
 
     private byte[] serializeTask(Task task) throws IOException {
@@ -31,33 +36,19 @@ public class Client {
     }
 
     private void sendData(byte[] data) throws IOException {
-        int DATA_SIZE = BUFFER_SIZE - 8;
-        int totalPackets = (int) Math.ceil((double) data.length / DATA_SIZE);
-
-        for (int i = 0; i < totalPackets; i++) {
-            int start = i * DATA_SIZE;
-            int end = Math.min(start + DATA_SIZE, data.length);
-            byte[] tempBuffer = Arrays.copyOfRange(data, start, end);
-
-            ByteBuffer buffer = ByteBuffer.allocate(tempBuffer.length + 8);
-            buffer.putInt(i);
-            buffer.putInt(totalPackets);
-            buffer.put(tempBuffer);
-            buffer.flip();
-
-            channel.send(buffer, serverAddress);
-        }
+        ByteBuffer buffer = ByteBuffer.wrap(data);
+        channel.send(buffer, serverAddress);
     }
 
-    private boolean getResponse() throws IOException, ClassNotFoundException {
+    private Task getResponse() throws IOException, ClassNotFoundException {
         ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
         channel.receive(buffer);
         buffer.flip();
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(buffer.array(), buffer.position(), buffer.limit());
+        ByteArrayInputStream bais = new ByteArrayInputStream(buffer.array(), buffer.position(), buffer.remaining());
         ObjectInputStream ois = new ObjectInputStream(bais);
-        Task responseTask = (Task) ois.readObject();
-        System.out.println(responseTask.getDescribe()[0]);
-        return responseTask.getDescribe()[0].equals("Login successful.") || responseTask.getDescribe()[0].equals("Registration successful.");
+        Task task = (Task) ois.readObject();
+        System.out.println("Response received: " + Arrays.toString(task.getDescribe()));
+        return task;
     }
 }

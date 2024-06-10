@@ -17,9 +17,9 @@ public class LoginCommand extends Command {
         try {
             boolean loginSuccess = DatabaseHandler.checkUserPassword(task.getUsername(), task.getPassword());
             if (loginSuccess) {
-                return new Task(new String[]{"Login successful."});
+                return new Task(new String[]{"true"});
             } else {
-                return new Task(new String[]{"Invalid username or password."});
+                return new Task(new String[]{"false"});
             }
         } catch (Exception e) {
             return new Task(new String[]{"Error during login: " + e.getMessage()});
