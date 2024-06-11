@@ -16,7 +16,6 @@ import java.util.Date;
 @Getter
 @Setter
 public class Ticket implements Comparable<Ticket>, Serializable {
-    @Getter
     private static int nextId = 1;
     private int id;
     private String name;

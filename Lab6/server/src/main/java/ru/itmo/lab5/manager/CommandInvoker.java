@@ -3,16 +3,15 @@ package ru.itmo.lab5.manager;
 import ru.itmo.lab5.manager.commands.*;
 import ru.itmo.lab5.util.Task;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class CommandInvoker {
     private final Map<String, CommandFactory> commandMap = new HashMap<>();
-    private final CollectionManager collectionManager;
     private final DatabaseHandler dbHandler;
 
-    public CommandInvoker(CollectionManager collectionManager, DatabaseHandler dbHandler) {
-        this.collectionManager = collectionManager;
+    public CommandInvoker(DatabaseHandler dbHandler) {
         this.dbHandler = dbHandler;
         registerCommands();
     }
@@ -25,14 +24,12 @@ public class CommandInvoker {
         register("clear", ClearCommand::new);
         register("filter_less_than_venue", FilterLessThanVenueCommand::new);
         register("help", HelpCommand::new);
-        register("info", InfoCommand::new);
         register("print_descending", PrintDescendingCommand::new);
         register("print_field_descending_venue", PrintFieldDescendingVenueCommand::new);
         register("remove_at", RemoveAtCommand::new);
         register("remove_by_id", RemoveByIDCommand::new);
         register("remove_first", RemoveFirstCommand::new);
         register("show", ShowCommand::new);
-        register("save", SaveCommand::new);
         register("update_id", UpdateIDCommand::new);
     }
 
@@ -40,10 +37,10 @@ public class CommandInvoker {
         commandMap.put(commandName, commandFactory);
     }
 
-    public Task executeCommand(Task task) {
+    public Task executeCommand(Task task) throws SQLException {
         CommandFactory factory = commandMap.get(task.getDescribe()[0]);
         if (factory != null) {
-            Command command = factory.create(collectionManager, dbHandler);
+            Command command = factory.create(dbHandler);
             return command.execute(task);
         } else {
             return new Task(new String[]{"Unknown command. Enter 'help' for assistance."});

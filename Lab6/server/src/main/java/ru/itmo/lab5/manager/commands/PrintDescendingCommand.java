@@ -1,26 +1,22 @@
 package ru.itmo.lab5.manager.commands;
 
-import ru.itmo.lab5.manager.CollectionManager;
 import ru.itmo.lab5.data.models.Ticket;
 import ru.itmo.lab5.manager.DatabaseHandler;
 import ru.itmo.lab5.util.Task;
 
-import java.util.Comparator;
 import java.util.List;
 
 public class PrintDescendingCommand extends Command {
 
-    public PrintDescendingCommand(CollectionManager collectionManager, DatabaseHandler dbHandler) {
-        super(collectionManager, dbHandler);
+    public PrintDescendingCommand(DatabaseHandler dbHandler) {
+        super(dbHandler);
         this.name = "print_descending";
         this.description = "Displays the elements of the collection in descending order";
     }
 
     @Override
     public Task execute(Task task) {
-        List<Ticket> sortedTickets = collectionManager.getTickets().stream()
-                .sorted(Comparator.comparing(Ticket::getPrice).reversed())
-                .toList();
+        List<Ticket> sortedTickets = dbHandler.getTicketsSortedByPriceDescending();
 
         if (sortedTickets.isEmpty()) {
             return new Task(new String[]{"The collection is empty."});

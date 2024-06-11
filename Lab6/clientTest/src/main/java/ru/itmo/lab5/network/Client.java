@@ -18,13 +18,9 @@ public class Client {
     }
 
     public Task sendTask(Task task) throws IOException, ClassNotFoundException {
-        System.out.println("Serializing task...");
         byte[] fullData = serializeTask(task);
-        System.out.println("Sending data...");
         sendData(fullData);
-        System.out.println("Receiving response...");
         Task response = getResponse();
-        System.out.println("Received response");
         return response;
     }
 
@@ -48,7 +44,6 @@ public class Client {
         ByteArrayInputStream bais = new ByteArrayInputStream(buffer.array(), buffer.position(), buffer.remaining());
         ObjectInputStream ois = new ObjectInputStream(bais);
         Task task = (Task) ois.readObject();
-        System.out.println("Response received: " + Arrays.toString(task.getDescribe()));
         return task;
     }
 }

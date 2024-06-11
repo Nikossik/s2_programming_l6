@@ -1,13 +1,12 @@
 package ru.itmo.lab5.manager.commands;
 
-import ru.itmo.lab5.manager.CollectionManager;
 import ru.itmo.lab5.manager.DatabaseHandler;
 import ru.itmo.lab5.util.Task;
 
 public class HelpCommand extends Command {
 
-    public HelpCommand(CollectionManager collectionManager, DatabaseHandler dbHandler) {
-        super(collectionManager, dbHandler);
+    public HelpCommand(DatabaseHandler dbHandler) {
+        super(dbHandler);
         this.name = "help";
         this.description = "Displays help for available commands";
     }

@@ -1,17 +1,15 @@
 package ru.itmo.lab5.manager.commands;
 
-import ru.itmo.lab5.manager.CollectionManager;
 import ru.itmo.lab5.data.models.Ticket;
 import ru.itmo.lab5.manager.DatabaseHandler;
 import ru.itmo.lab5.util.Task;
 
-/**
- * Команда для вывода всех элементов коллекции.
- */
+import java.util.List;
+
 public class ShowCommand extends Command {
 
-    public ShowCommand(CollectionManager collectionManager, DatabaseHandler dbHandler) {
-        super(collectionManager, dbHandler);
+    public ShowCommand(DatabaseHandler dbHandler) {
+        super(dbHandler);
         this.name = "show";
         this.description = "List all tickets";
     }
@@ -19,20 +17,14 @@ public class ShowCommand extends Command {
     @Override
     public Task execute(Task task) {
         try {
-            var tickets = collectionManager.getTickets();
+            List<Ticket> tickets = dbHandler.getTickets();
             if (tickets.isEmpty()) {
                 return new Task(new String[]{"Collection is empty."});
             } else {
-                StringBuilder answer = new StringBuilder();
-                answer.append("Collection items:\n");
-                for (Ticket ticket : tickets) {
-                    answer.append(ticket).append("\n");
-                }
-                return new Task(new String[]{answer.toString()});
+                return new Task(tickets);
             }
         } catch (Exception e) {
             return new Task(new String[]{"Error retrieving tickets: " + e.getMessage()});
         }
     }
-
 }

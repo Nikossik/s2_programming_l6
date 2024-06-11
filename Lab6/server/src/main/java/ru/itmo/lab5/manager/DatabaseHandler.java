@@ -6,6 +6,9 @@ import ru.itmo.lab5.exceptions.UserException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,65 +28,48 @@ public class DatabaseHandler {
         }
     }
 
-    public boolean saveCollectionToDatabase(CollectionManager collectionManager) {
-        clearTickets();
-        String resetSequenceQuery = "ALTER SEQUENCE tickets_id_seq RESTART;";
-        String updateTicketIdQuery = "UPDATE tickets SET id = DEFAULT;";
-        String insertTicketQuery = "INSERT INTO tickets (ticket_name, coordinates_x, coordinates_y, creation_date, price, ticket_type, venue_id, venue_name, venue_capacity, venue_type, address_street, address_zipcode, address_town_x, address_town_y, address_town_name, username) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
-                + "ON CONFLICT (id) DO UPDATE SET ticket_name = EXCLUDED.ticket_name, coordinates_x = EXCLUDED.coordinates_x, coordinates_y = EXCLUDED.coordinates_y, creation_date = EXCLUDED.creation_date, price = EXCLUDED.price, ticket_type = EXCLUDED.ticket_type, venue_id = EXCLUDED.venue_id, venue_name = EXCLUDED.venue_name, venue_capacity = EXCLUDED.venue_capacity, venue_type = EXCLUDED.venue_type, address_street = EXCLUDED.address_street, address_zipcode = EXCLUDED.address_zipcode, address_town_x = EXCLUDED.address_town_x, address_town_y = EXCLUDED.address_town_y, address_town_name = EXCLUDED.address_town_name, username = EXCLUDED.username RETURNING id;";
+    public List<Ticket> getTickets() {
+        List<Ticket> tickets = new ArrayList<>();
+        String query = "SELECT * FROM tickets";
+        try (Connection connection = getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
 
-        try (Connection connection = getConnection()) {
-            connection.setAutoCommit(false);
-
-            try (PreparedStatement resetSeqStmt = connection.prepareStatement(resetSequenceQuery)) {
-                resetSeqStmt.executeUpdate();
-            }
-
-            try (PreparedStatement updateIdStmt = connection.prepareStatement(updateTicketIdQuery)) {
-                updateIdStmt.executeUpdate();
-            }
-
-            try (PreparedStatement ticketStmt = connection.prepareStatement(insertTicketQuery)) {
-                for (Ticket ticket : collectionManager.getTickets()) {
-                    ticketStmt.setString(1, ticket.getName());
-                    ticketStmt.setInt(2, ticket.getCoordinates().getX());
-                    ticketStmt.setDouble(3, ticket.getCoordinates().getY());
-                    ticketStmt.setTimestamp(4, new Timestamp(ticket.getCreationDate().getTime()));
-                    ticketStmt.setLong(5, ticket.getPrice());
-                    ticketStmt.setString(6, ticket.getType() != null ? ticket.getType().name() : null);
-
-                    Venue venue = ticket.getVenue();
-                    ticketStmt.setObject(7, venue != null ? (int) venue.getId() : null, Types.INTEGER);
-                    ticketStmt.setString(8, venue != null ? venue.getName() : null);
-                    ticketStmt.setObject(9, venue != null ? venue.getCapacity() : null, Types.INTEGER);
-                    ticketStmt.setString(10, venue != null && venue.getType() != null ? venue.getType().name() : null);
-
-                    Address address = venue != null ? venue.getAddress() : null;
-                    ticketStmt.setString(11, address != null ? address.getStreet() : null);
-                    ticketStmt.setString(12, address != null ? address.getZipCode() : null);
-
-                    Location town = address != null ? address.getTown() : null;
-                    ticketStmt.setObject(13, town != null ? town.getX() : null, Types.INTEGER);
-                    ticketStmt.setObject(14, town != null ? town.getY() : null, Types.DOUBLE);
-                    ticketStmt.setString(15, town != null ? town.getName() : null);
-
-                    ticketStmt.setString(16, ticket.getUsername());
-
-                    try (ResultSet rs = ticketStmt.executeQuery()) {
-                        if (rs.next()) {
-                            ticket.setId(rs.getInt("id"));
-                        }
-                    }
-                }
-
-                connection.commit();
-                return true;
+            while (rs.next()) {
+                Ticket ticket = resultSetToTicket(rs);
+                tickets.add(ticket);
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error connecting to database: " + e.getMessage());
-            return false;
+            logger.log(Level.SEVERE, "Error retrieving tickets from database: " + e.getMessage());
         }
+        return tickets;
+    }
+
+    private Ticket resultSetToTicket(ResultSet rs) throws SQLException {
+        Ticket ticket = new Ticket();
+        ticket.setId(rs.getInt("id"));
+        ticket.setName(rs.getString("ticket_name"));
+        ticket.setCoordinates(new Coordinates(rs.getInt("coordinates_x"), rs.getDouble("coordinates_y")));
+        ticket.setCreationDate(rs.getTimestamp("creation_date"));
+        ticket.setPrice(rs.getLong("price"));
+        ticket.setType(TicketType.valueOf(rs.getString("ticket_type")));
+
+        Venue venue = new Venue();
+        venue.setId(rs.getLong("venue_id"));
+        venue.setName(rs.getString("venue_name"));
+        venue.setCapacity(rs.getInt("venue_capacity"));
+        venue.setType(VenueType.valueOf(rs.getString("venue_type")));
+
+        Address address = new Address();
+        address.setStreet(rs.getString("address_street"));
+        address.setZipCode(rs.getString("address_zipcode"));
+        address.setTown(new Location(rs.getInt("address_town_x"), rs.getDouble("address_town_y"), rs.getString("address_town_name")));
+        venue.setAddress(address);
+
+        ticket.setVenue(venue);
+        ticket.setUsername(rs.getString("username"));
+
+        return ticket;
     }
 
     public static boolean checkUserPresence(String username) {
@@ -156,22 +142,12 @@ public class DatabaseHandler {
         }
     }
 
-    public void clearTickets() {
-        String clearTicketsQuery = "DELETE FROM tickets;";
+    public Ticket getMinTicketByPrice() throws SQLException {
+        String getMinTicketQuery = "SELECT * FROM tickets ORDER BY price ASC LIMIT 1;";
         try (Connection connection = getConnection();
-             PreparedStatement stmt = connection.prepareStatement(clearTicketsQuery)) {
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, e.getMessage());
-        }
-    }
-
-    public void loadAllTicketsToMemory(CollectionManager collectionManager) {
-        String getAllTicketsQuery = "SELECT * FROM tickets;";
-        try (Connection connection = getConnection();
-             PreparedStatement stmt = connection.prepareStatement(getAllTicketsQuery);
+             PreparedStatement stmt = connection.prepareStatement(getMinTicketQuery);
              ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
+            if (rs.next()) {
                 Ticket ticket = new Ticket();
                 ticket.setId(rs.getInt("id"));
                 ticket.setName(rs.getString("ticket_name"));
@@ -194,15 +170,168 @@ public class DatabaseHandler {
 
                 ticket.setVenue(venue);
 
-                String username = rs.getString("username");
-                ticket.setUsername(username);
+                ticket.setUsername(rs.getString("username"));
 
-                collectionManager.addFromDB(ticket);
+                return ticket;
+            } else {
+                return null;
             }
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, e.getMessage());
         }
     }
 
+    public void addTicket(Ticket ticket) throws SQLException {
+        String insertTicketQuery = "INSERT INTO tickets (ticket_name, coordinates_x, coordinates_y, creation_date, price, ticket_type, venue_id, venue_name, venue_capacity, venue_type, address_street, address_zipcode, address_town_x, address_town_y, address_town_name, username) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+        try (Connection connection = getConnection();
+             PreparedStatement ticketStmt = connection.prepareStatement(insertTicketQuery, Statement.RETURN_GENERATED_KEYS)) {
+
+            ticketStmt.setString(1, ticket.getName());
+            ticketStmt.setInt(2, ticket.getCoordinates().getX());
+            ticketStmt.setDouble(3, ticket.getCoordinates().getY());
+            ticketStmt.setTimestamp(4, new Timestamp(ticket.getCreationDate().getTime()));
+            ticketStmt.setLong(5, ticket.getPrice());
+            ticketStmt.setString(6, ticket.getType() != null ? ticket.getType().name() : null);
+
+            Venue venue = ticket.getVenue();
+            ticketStmt.setObject(7, venue != null ? (int) venue.getId() : null, Types.INTEGER);
+            ticketStmt.setString(8, venue != null ? venue.getName() : null);
+            ticketStmt.setObject(9, venue != null ? venue.getCapacity() : null, Types.INTEGER);
+            ticketStmt.setString(10, venue != null && venue.getType() != null ? venue.getType().name() : null);
+
+            Address address = venue != null ? venue.getAddress() : null;
+            ticketStmt.setString(11, address != null ? address.getStreet() : null);
+            ticketStmt.setString(12, address != null ? address.getZipCode() : null);
+
+            Location town = address != null ? address.getTown() : null;
+            ticketStmt.setObject(13, town != null ? town.getX() : null, Types.INTEGER);
+            ticketStmt.setObject(14, town != null ? town.getY() : null, Types.DOUBLE);
+            ticketStmt.setString(15, town != null ? town.getName() : null);
+
+            ticketStmt.setString(16, ticket.getUsername());
+
+            ticketStmt.executeUpdate();
+
+            try (ResultSet rs = ticketStmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    ticket.setId(rs.getInt(1));
+                }
+            }
+        }
+    }
+
+    public void clearTicketsByUsername(String username) throws SQLException {
+        String clearTicketsQuery = "DELETE FROM tickets WHERE username = ?;";
+        try (Connection connection = getConnection();
+             PreparedStatement stmt = connection.prepareStatement(clearTicketsQuery)) {
+            stmt.setString(1, username);
+            stmt.executeUpdate();
+        }
+    }
+
+    public List<Ticket> getTicketsWithVenueLessThan(int capacity) {
+        String query = "SELECT * FROM tickets WHERE venue_capacity < ? ORDER BY venue_capacity ASC";
+        try (Connection connection = getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, capacity);
+            try (ResultSet rs = stmt.executeQuery()) {
+                List<Ticket> tickets = new ArrayList<>();
+                while (rs.next()) {
+                    tickets.add(resultSetToTicket(rs));
+                }
+                return tickets;
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error retrieving tickets: " + e.getMessage());
+            return Collections.emptyList();
+        }
+    }
+
+    public List<Ticket> getTicketsSortedByPriceDescending() {
+        String query = "SELECT * FROM tickets ORDER BY price DESC";
+        try (Connection connection = getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            List<Ticket> tickets = new ArrayList<>();
+            while (rs.next()) {
+                tickets.add(resultSetToTicket(rs));
+            }
+            return tickets;
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error retrieving tickets: " + e.getMessage());
+            return Collections.emptyList();
+        }
+    }
+
+    public List<Ticket> getTicketsSortedByVenueCapacityDescending() {
+        String query = "SELECT * FROM tickets WHERE venue_capacity IS NOT NULL ORDER BY venue_capacity DESC";
+        try (Connection connection = getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            List<Ticket> tickets = new ArrayList<>();
+            while (rs.next()) {
+                tickets.add(resultSetToTicket(rs));
+            }
+            return tickets;
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error retrieving tickets: " + e.getMessage());
+            return Collections.emptyList();
+        }
+    }
+
+    public boolean removeTicketAt(int index) throws SQLException {
+        String query = "DELETE FROM tickets WHERE id = (SELECT id FROM tickets ORDER BY id LIMIT 1 OFFSET ?)";
+        try (Connection connection = getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, index);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        }
+    }
+
+    public boolean removeTicketById(long id) throws SQLException {
+        String query = "DELETE FROM tickets WHERE id = ?";
+        try (Connection connection = getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setLong(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        }
+    }
+
+    public boolean removeFirstTicket() throws SQLException {
+        String query = "DELETE FROM tickets WHERE id = (SELECT id FROM tickets ORDER BY id LIMIT 1)";
+        try (Connection connection = getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        }
+    }
+
+    public boolean updateTicketById(long id, Ticket updatedTicket) throws SQLException {
+        String query = "UPDATE tickets SET ticket_name = ?, coordinates_x = ?, coordinates_y = ?, creation_date = ?, price = ?, ticket_type = ?, venue_id = ?, venue_name = ?, venue_capacity = ?, venue_type = ?, address_street = ?, address_zipcode = ?, address_town_x = ?, address_town_y = ?, address_town_name = ?, username = ? WHERE id = ?";
+        try (Connection connection = getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, updatedTicket.getName());
+            stmt.setInt(2, updatedTicket.getCoordinates().getX());
+            stmt.setDouble(3, updatedTicket.getCoordinates().getY());
+            stmt.setTimestamp(4, new java.sql.Timestamp(updatedTicket.getCreationDate().getTime()));
+            stmt.setLong(5, updatedTicket.getPrice());
+            stmt.setString(6, updatedTicket.getType().name());
+            stmt.setObject(7, updatedTicket.getVenue() != null ? (int) updatedTicket.getVenue().getId() : null, java.sql.Types.INTEGER);
+            stmt.setString(8, updatedTicket.getVenue() != null ? updatedTicket.getVenue().getName() : null);
+            stmt.setObject(9, updatedTicket.getVenue() != null ? updatedTicket.getVenue().getCapacity() : null, java.sql.Types.INTEGER);
+            stmt.setString(10, updatedTicket.getVenue() != null && updatedTicket.getVenue().getType() != null ? updatedTicket.getVenue().getType().name() : null);
+            stmt.setString(11, updatedTicket.getVenue() != null && updatedTicket.getVenue().getAddress() != null ? updatedTicket.getVenue().getAddress().getStreet() : null);
+            stmt.setString(12, updatedTicket.getVenue() != null && updatedTicket.getVenue().getAddress() != null ? updatedTicket.getVenue().getAddress().getZipCode() : null);
+            stmt.setObject(13, updatedTicket.getVenue() != null && updatedTicket.getVenue().getAddress() != null ? updatedTicket.getVenue().getAddress().getTown().getX() : null, java.sql.Types.INTEGER);
+            stmt.setObject(14, updatedTicket.getVenue() != null && updatedTicket.getVenue().getAddress() != null ? updatedTicket.getVenue().getAddress().getTown().getY() : null, java.sql.Types.DOUBLE);
+            stmt.setString(15, updatedTicket.getVenue() != null && updatedTicket.getVenue().getAddress() != null ? updatedTicket.getVenue().getAddress().getTown().getName() : null);
+            stmt.setString(16, updatedTicket.getUsername());
+            stmt.setLong(17, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        }
+    }
 
 }

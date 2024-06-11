@@ -23,6 +23,7 @@ public class DisplayTicket extends Ticket {
     private Long price;
     private TicketType type;
     private DisplayVenue venue;
+    private String username;
 
     private transient IntegerProperty idProperty = new SimpleIntegerProperty();
     private transient StringProperty nameProperty = new SimpleStringProperty();
@@ -31,6 +32,7 @@ public class DisplayTicket extends Ticket {
     private transient LongProperty priceProperty = new SimpleLongProperty();
     private transient ObjectProperty<TicketType> typeProperty = new SimpleObjectProperty<>();
     private transient ObjectProperty<DisplayVenue> venueProperty = new SimpleObjectProperty<>();
+    private transient StringProperty usernameProperty = new SimpleStringProperty();
 
     public DisplayTicket(Ticket ticket) {
         this.id = ticket.getId();
@@ -40,6 +42,7 @@ public class DisplayTicket extends Ticket {
         this.price = ticket.getPrice();
         this.type = ticket.getType();
         this.venue = new DisplayVenue(ticket.getVenue());
+        this.username = ticket.getUsername();
 
         coordinates.bindProperties();
         venue.bindProperties();
@@ -50,6 +53,7 @@ public class DisplayTicket extends Ticket {
         priceProperty.bindBidirectional(new SimpleLongProperty(price));
         typeProperty.bindBidirectional(new SimpleObjectProperty<>(type));
         venueProperty.bindBidirectional(new SimpleObjectProperty<>(venue));
+        usernameProperty.bindBidirectional(new SimpleStringProperty(username));
     }
 
     public void bindProperties() {
@@ -62,6 +66,7 @@ public class DisplayTicket extends Ticket {
         priceProperty.bindBidirectional(new SimpleLongProperty(price));
         typeProperty.bindBidirectional(new SimpleObjectProperty<>(type));
         venueProperty.bindBidirectional(new SimpleObjectProperty<>(venue));
+        usernameProperty.bindBidirectional(new SimpleStringProperty(username));
     }
 
 }

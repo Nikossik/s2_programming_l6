@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="780.0" prefWidth="1337.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" stylesheets="styles/table.css">
+    <left>
+        <VBox prefHeight="371.0" prefWidth="140.0" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="addButton" mnemonicParsing="false" text="%addButtonText" onAction="#handleAddButton">
+                    <tooltip>
+                        <Tooltip text="%addTooltip"/>
+                    </tooltip>
+                </Button>
+                <Button fx:id="removeButton" mnemonicParsing="false" text="%removeButtonText" onAction="#handleRemoveById">
+                    <tooltip>
+                        <Tooltip text="%removeTooltip"/>
+                    </tooltip>
+                </Button>
+                <Button fx:id="addIfMinButton" mnemonicParsing="false" text="%addIfMinButtonText" onAction="#handleAddIfMinButton">
+                    <tooltip>
+                        <Tooltip text="%addIfMinTooltip"/>
+                    </tooltip>
+                </Button>
+            </children>
+        </VBox>
+    </left>
+    <center>
+        <TableView fx:id="tableView" prefHeight="736.0" prefWidth="1200.0" BorderPane.alignment="CENTER">
+            <columns>
+                <TableColumn fx:id="idColumn" prefWidth="75.0" text="%idColumnHeader"/>
+                <TableColumn fx:id="nameColumn" prefWidth="75.0" text="%nameColumnHeader" />
+                <TableColumn fx:id="latitudeColumn" prefWidth="158.0" text="%latitudeColumnHeader" />
+                <TableColumn fx:id="longitudeColumn" prefWidth="164.0" text="%longitudeColumnHeader" />
+                <TableColumn fx:id="creationDateColumn" prefWidth="91.0" text="%creationDateColumnHeader" />
+                <TableColumn fx:id="priceColumn" prefWidth="68.0" text="%priceColumnHeader" />
+                <TableColumn fx:id="typeColumn" prefWidth="98.0" text="%typeColumnHeader" />
+                <TableColumn fx:id="venueNameColumn" text="Venue Name" />
+                <TableColumn fx:id="venueCapacityColumn" text="Venue Capacity" />
+                <TableColumn fx:id="venueTypeColumn" text="Venue Type" />
+                <TableColumn fx:id="venueAddressStreetColumn" text="Venue Address Street" />
+                <TableColumn fx:id="venueAddressZipCodeColumn" text="Venue Address Zip Code" />
+                <TableColumn fx:id="venueAddressTownXColumn" text="Venue Address Town X" />
+                <TableColumn fx:id="venueAddressTownYColumn" text="Venue Address Town Y" />
+                <TableColumn fx:id="venueAddressTownNameColumn" text="Venue Address Town Name" />
+                <TableColumn fx:id="creatorColumn" prefWidth="94.0" text="%creatorColumnHeader" />
+            </columns>
+        </TableView>
+    </center>
+    <bottom>
+        <HBox fx:id="bottomHBox" prefHeight="39.0" prefWidth="624.0" BorderPane.alignment="CENTER">
+            <children>
+                <Button mnemonicParsing="false" onAction="#handleLogoutButton" text="%logoutButtonText" />
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>

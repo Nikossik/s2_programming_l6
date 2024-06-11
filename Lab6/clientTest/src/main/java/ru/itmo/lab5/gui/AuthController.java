@@ -56,7 +56,7 @@ public class AuthController {
     public void showTable(ActionEvent event) {
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("Table.fxml"));
         ResourceBundle bundle = ResourceBundle.getBundle("table", locale);
-        // loader.setController(new TableController(client, locale));
+        loader.setController(new TableController(client, locale, loginField.getText()));
         loader.setResources(bundle);
         Parent root;
         try {
