@@ -17,7 +17,7 @@ public class Server {
     private static final Logger logger = Logger.getLogger(Server.class.getName());
     private final DatagramChannel channel;
     private final CommandInvoker commandInvoker;
-    private final ExecutorService responsePool = Executors.newCachedThreadPool();
+    private final ExecutorService requestPool = Executors.newCachedThreadPool();
 
     public Server(DatabaseHandler dbHandler) throws IOException {
         this.commandInvoker = new CommandInvoker(dbHandler);
@@ -33,7 +33,7 @@ public class Server {
                 ByteBuffer buffer = ByteBuffer.allocate(65000);
                 SocketAddress remoteAddr = channel.receive(buffer);
                 buffer.flip();
-                processPacket(buffer, remoteAddr);
+                requestPool.execute(() -> processPacket(buffer, remoteAddr));
             }
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error receiving task: " + e.getMessage());
@@ -45,13 +45,7 @@ public class Server {
             Task task = deserializeTask(buffer);
             logger.info("Executing: " + task.getDescribe()[0]);
             Task responseTask = commandInvoker.executeCommand(task);
-            responsePool.execute(() -> {
-                try {
-                    sendResponse(responseTask, remoteAddr);
-                } catch (IOException e) {
-                    logger.log(Level.SEVERE, "Error sending response: " + e.getMessage());
-                }
-            });
+            sendResponse(responseTask, remoteAddr);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error processing task: " + e.getMessage());
         }

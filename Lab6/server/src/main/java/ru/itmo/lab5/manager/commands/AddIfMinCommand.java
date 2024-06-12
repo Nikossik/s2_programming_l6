@@ -8,7 +8,6 @@ public class AddIfMinCommand extends Command {
     public AddIfMinCommand(DatabaseHandler dbHandler) {
         super(dbHandler);
         this.name = "add_if_min";
-        this.description = "Add new ticket to the collection if it is less than min";
     }
 
     @Override
@@ -16,19 +15,19 @@ public class AddIfMinCommand extends Command {
         try {
             Ticket newTicket = task.getTicket();
             if (newTicket == null) {
-                return new Task(new String[]{"Unable to create new ticket."});
+                return new Task(new String[]{"false"});
             }
 
             Ticket minTicket = dbHandler.getMinTicketByPrice();
 
             if (minTicket == null || newTicket.getPrice() < minTicket.getPrice()) {
                 dbHandler.addTicket(newTicket);
-                return new Task(new String[]{"New ticket added."});
+                return new Task(new String[]{"true"});
             } else {
-                return new Task(new String[]{"New ticket is not less than min."});
+                return new Task(new String[]{"false"});
             }
         } catch (Exception e) {
-            return new Task(new String[]{"Error adding new ticket: " + e.getMessage()});
+            return new Task(new String[]{"Error:" + e.getMessage()});
         }
     }
 }

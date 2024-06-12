@@ -11,7 +11,6 @@ public class PrintFieldDescendingVenueCommand extends Command {
     public PrintFieldDescendingVenueCommand(DatabaseHandler dbHandler) {
         super(dbHandler);
         this.name = "print_field_descending_venue";
-        this.description = "Outputs the values of the venue field of all elements in descending order";
     }
 
     @Override

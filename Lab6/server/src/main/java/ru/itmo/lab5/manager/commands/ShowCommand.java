@@ -11,7 +11,6 @@ public class ShowCommand extends Command {
     public ShowCommand(DatabaseHandler dbHandler) {
         super(dbHandler);
         this.name = "show";
-        this.description = "List all tickets";
     }
 
     @Override

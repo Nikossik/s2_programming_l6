@@ -11,7 +11,6 @@ public class RemoveAtCommand extends Command {
     public RemoveAtCommand(DatabaseHandler dbHandler) {
         super(dbHandler);
         this.name = "remove_at <index>";
-        this.description = "Удаляет элемент из коллекции по его индексу";
     }
 
     @Override

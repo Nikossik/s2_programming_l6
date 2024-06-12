@@ -11,19 +11,18 @@ public class UpdateIDCommand extends Command {
     public UpdateIDCommand(DatabaseHandler dbHandler) {
         super(dbHandler);
         this.name = "update_id <id>";
-        this.description = "Обновляет значение элемента коллекции, ID которого равен заданному";
     }
 
     @Override
     public Task execute(Task task) {
         if (task.getDescribe().length < 2 || task.getDescribe()[1].isEmpty()) {
-            return new Task(new String[]{"спользование: '" + task.getDescribe()[0] + "'"});
+            return new Task(new String[]{"false"});
         }
         long id;
         try {
             id = Long.parseLong(task.getDescribe()[1]);
         } catch (NumberFormatException e) {
-            return new Task(new String[]{"ID должен быть числом. Передано неверное значение: " + task.getDescribe()[1]});
+            return new Task(new String[]{"false"});
         }
 
         Ticket updatedTicket = task.getTicket();
@@ -31,15 +30,15 @@ public class UpdateIDCommand extends Command {
             try {
                 boolean updated = dbHandler.updateTicketById(id, updatedTicket);
                 if (updated) {
-                    return new Task(new String[]{"Билет с ID " + id + " был успешно обновлен."});
+                    return new Task(new String[]{"true"});
                 } else {
-                    return new Task(new String[]{"Билет с таким ID не найден."});
+                    return new Task(new String[]{"false"});
                 }
             } catch (Exception e) {
-                return new Task(new String[]{"Ошибка при обновлении билета: " + e.getMessage()});
+                return new Task(new String[]{"false"});
             }
         } else {
-            return new Task(new String[]{"Ошибка при создании билета. Обновление отменено."});
+            return new Task(new String[]{"false"});
         }
     }
 }

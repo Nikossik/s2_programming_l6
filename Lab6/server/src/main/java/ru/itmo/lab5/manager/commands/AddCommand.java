@@ -8,7 +8,6 @@ public class AddCommand extends Command {
     public AddCommand(DatabaseHandler dbHandler) {
         super(dbHandler);
         this.name = "add";
-        this.description = "Adds an element to the collection";
     }
 
     @Override

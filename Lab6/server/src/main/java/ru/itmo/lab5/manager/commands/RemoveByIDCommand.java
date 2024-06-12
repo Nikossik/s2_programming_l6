@@ -8,7 +8,6 @@ public class RemoveByIDCommand extends Command {
     public RemoveByIDCommand(DatabaseHandler dbHandler) {
         super(dbHandler);
         this.name = "remove_by_id <id>";
-        this.description = "Delete a specified collection by id";
     }
 
     @Override

@@ -8,7 +8,6 @@ public class HelpCommand extends Command {
     public HelpCommand(DatabaseHandler dbHandler) {
         super(dbHandler);
         this.name = "help";
-        this.description = "Displays help for available commands";
     }
 
     @Override

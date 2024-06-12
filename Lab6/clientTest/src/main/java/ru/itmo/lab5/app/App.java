@@ -19,7 +19,7 @@ import java.util.ResourceBundle;
 
 public class App extends Application {
 
-    private Locale currentLocale = Locale.forLanguageTag("en-UK");
+    private Locale currentLocale = Locale.forLanguageTag("ru_RU");
     private ResourceBundle bundle = ResourceBundle.getBundle("auth", currentLocale);
     private Client client;
 
@@ -33,16 +33,7 @@ public class App extends Application {
 
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root);
-
-        Button englishButton = new Button("English");
-        englishButton.setOnAction(event -> changeLocale(Locale.forLanguageTag("en-UK"), primaryStage, scene));
-
-        Button russianButton = new Button("Русский");
-        russianButton.setOnAction(event -> changeLocale(new Locale("ru-RU"), primaryStage, scene));
-
-        HBox buttonBox = new HBox(10, englishButton, russianButton);
-        buttonBox.setPadding(new Insets(10));
-        buttonBox.setAlignment(Pos.CENTER_LEFT);
+        HBox buttonBox = getButtonBox(primaryStage, scene);
 
         if (root instanceof Pane) {
             ((Pane) root).getChildren().addAll(buttonBox);
@@ -63,26 +54,38 @@ public class App extends Application {
             try {
                 Parent root = fxmlLoader.load();
 
-                Button englishButton = new Button("English");
-                englishButton.setOnAction(event -> changeLocale(Locale.forLanguageTag("en-UK"), stage, scene));
-
-                Button russianButton = new Button("Русский");
-                russianButton.setOnAction(event -> changeLocale(new Locale("ru-RU"), stage, scene));
-
-                HBox buttonBox = new HBox(10, englishButton, russianButton);
-                buttonBox.setPadding(new Insets(10));
-                buttonBox.setAlignment(Pos.CENTER_LEFT);
+                HBox buttonBox = getButtonBox(stage, scene);
 
                 if (root instanceof Pane) {
                     ((Pane) root).getChildren().addAll(buttonBox);
                 }
 
                 scene.setRoot(root);
+
                 stage.setScene(scene);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    private HBox getButtonBox(Stage stage, Scene scene) {
+        Button englishButton = new Button("English");
+        englishButton.setOnAction(event -> changeLocale(Locale.forLanguageTag("en_UK"), stage, scene));
+
+        Button russianButton = new Button("Русский");
+        russianButton.setOnAction(event -> changeLocale(new Locale("ru_RU"), stage, scene));
+
+        Button daButton = new Button("Suomalainen");
+        daButton.setOnAction(event -> changeLocale(new Locale("fi_FI"), stage, scene));
+
+        Button nlButton = new Button("Shqiptare");
+        nlButton.setOnAction(event -> changeLocale(new Locale("sq_AL"), stage, scene));
+
+        HBox buttonBox = new HBox(10, englishButton, russianButton, daButton, nlButton);
+        buttonBox.setPadding(new Insets(10));
+        buttonBox.setAlignment(Pos.CENTER_LEFT);
+        return buttonBox;
     }
 
     public static void main(String[] args) {

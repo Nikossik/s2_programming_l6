@@ -11,7 +11,6 @@ public class PrintDescendingCommand extends Command {
     public PrintDescendingCommand(DatabaseHandler dbHandler) {
         super(dbHandler);
         this.name = "print_descending";
-        this.description = "Displays the elements of the collection in descending order";
     }
 
     @Override

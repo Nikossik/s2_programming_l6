@@ -8,7 +8,6 @@ public class LoginCommand extends Command {
     public LoginCommand(DatabaseHandler dbHandler) {
         super(dbHandler);
         this.name = "login";
-        this.description = "Logs in a user";
     }
 
     @Override

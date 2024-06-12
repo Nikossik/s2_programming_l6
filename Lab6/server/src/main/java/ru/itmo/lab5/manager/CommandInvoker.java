@@ -43,7 +43,7 @@ public class CommandInvoker {
             Command command = factory.create(dbHandler);
             return command.execute(task);
         } else {
-            return new Task(new String[]{"Unknown command. Enter 'help' for assistance."});
+            return new Task(new String[]{"false"});
         }
     }
 }

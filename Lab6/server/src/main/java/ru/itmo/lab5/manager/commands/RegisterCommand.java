@@ -8,7 +8,6 @@ public class RegisterCommand extends Command {
     public RegisterCommand(DatabaseHandler dbHandler) {
         super(dbHandler);
         this.name = "register";
-        this.description = "Registers a new user";
     }
 
     @Override

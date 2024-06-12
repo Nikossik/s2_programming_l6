@@ -17,14 +17,29 @@
                         <Tooltip text="%addTooltip"/>
                     </tooltip>
                 </Button>
+                <Button fx:id="addIfMinButton" mnemonicParsing="false" text="%addIfMinButtonText" onAction="#handleAddIfMinButton">
+                    <tooltip>
+                        <Tooltip text="%addIfMinTooltip"/>
+                    </tooltip>
+                </Button>
                 <Button fx:id="removeButton" mnemonicParsing="false" text="%removeButtonText" onAction="#handleRemoveById">
                     <tooltip>
                         <Tooltip text="%removeTooltip"/>
                     </tooltip>
                 </Button>
-                <Button fx:id="addIfMinButton" mnemonicParsing="false" text="%addIfMinButtonText" onAction="#handleAddIfMinButton">
+                <Button fx:id="removeFirstButton" mnemonicParsing="false" text="%removeFirstButtonText" onAction="#handleRemoveFirstButton">
                     <tooltip>
-                        <Tooltip text="%addIfMinTooltip"/>
+                        <Tooltip text="%removeFirstTooltip"/>
+                    </tooltip>
+                </Button>
+                <Button fx:id="updateButton" mnemonicParsing="false" text="%updateButtonText" onAction="#handleupdateButton">
+                    <tooltip>
+                        <Tooltip text="%updateTooltip"/>
+                    </tooltip>
+                </Button>
+                <Button fx:id="executeScriptButton" mnemonicParsing="false" text="%executeScriptButtonText" onAction="#handleExecuteScriptButton">
+                    <tooltip>
+                        <Tooltip text="%executeScriptTooltip"/>
                     </tooltip>
                 </Button>
             </children>
@@ -56,6 +71,7 @@
         <HBox fx:id="bottomHBox" prefHeight="39.0" prefWidth="624.0" BorderPane.alignment="CENTER">
             <children>
                 <Button mnemonicParsing="false" onAction="#handleLogoutButton" text="%logoutButtonText" />
+                <Button fx:id="visualizeButton" onAction="#handleVisualizeButton" text="Visualize" />
             </children>
         </HBox>
     </bottom>

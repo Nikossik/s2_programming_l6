@@ -11,7 +11,6 @@ public class RemoveFirstCommand extends Command {
     public RemoveFirstCommand(DatabaseHandler dbHandler) {
         super(dbHandler);
         this.name = "remove_first";
-        this.description = "Удаляет первый элемент из коллекции";
     }
 
     @Override

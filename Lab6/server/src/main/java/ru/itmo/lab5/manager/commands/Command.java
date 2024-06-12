@@ -11,7 +11,6 @@ import java.sql.SQLException;
 @Setter
 public abstract class Command {
     protected String name;
-    protected String description;
     protected DatabaseHandler dbHandler;
 
     public Command(DatabaseHandler dbHandler) {
