@@ -6,6 +6,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.layout.Pane;
@@ -110,60 +111,62 @@ public class TableController {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                LinkedList<DisplayTicket> linkedList = new LinkedList<>();
-                try {
-                    Task requestTask = new Task(new String[]{"show"});
-                    Task responseTask = client.sendTask(requestTask);
-                    if (responseTask != null && responseTask.getTickets() != null) {
-                        for (Ticket ticket : responseTask.getTickets()) {
-                            linkedList.add(new DisplayTicket(ticket));
+                Platform.runLater(() -> {
+                    LinkedList<DisplayTicket> linkedList = new LinkedList<>();
+                    try {
+                        Task requestTask = new Task(new String[]{"show"});
+                        Task responseTask = client.sendTask(requestTask);
+                        if (responseTask != null && responseTask.getTickets() != null) {
+                            for (Ticket ticket : responseTask.getTickets()) {
+                                linkedList.add(new DisplayTicket(ticket));
+                            }
                         }
+                        var tickets = FXCollections.observableArrayList(linkedList);
+                        idColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getIdProperty().getValue().toString()));
+                        nameColumn.setCellValueFactory(data -> data.getValue().getNameProperty());
+                        latitudeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCoordinatesProperty().getValue().getXProperty().getValue().toString()));
+                        longitudeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCoordinatesProperty().getValue().getYProperty().getValue().toString()));
+                        creationDateColumn.setCellValueFactory(data -> {
+                            Date creationDate = data.getValue().getCreationDateProperty().getValue();
+                            LocalDate localDate = creationDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                            return new SimpleObjectProperty<>(localDate);
+                        });
+                        priceColumn.setCellValueFactory(data -> data.getValue().getPriceProperty().asObject());
+                        typeColumn.setCellValueFactory(data -> data.getValue().getTypeProperty());
+
+                        venueNameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getVenueProperty().getValue().getName()));
+                        venueCapacityColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getVenueProperty().getValue().getCapacity()));
+                        venueTypeColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getVenueProperty().getValue().getType()));
+                        venueAddressStreetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getVenueProperty().getValue().getAddress().getStreet()));
+                        venueAddressZipCodeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getVenueProperty().getValue().getAddress().getZipCode()));
+                        venueAddressTownXColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getVenueProperty().getValue().getAddress().getTown().getX()));
+                        venueAddressTownYColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getVenueProperty().getValue().getAddress().getTown().getY()));
+                        venueAddressTownNameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getVenueProperty().getValue().getAddress().getTown().getName()));
+
+                        creatorColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getUsername()));
+                        tableView.setItems(tickets);
+                    } catch (IOException | ClassNotFoundException e) {
+                        e.printStackTrace();
                     }
-                    var tickets = FXCollections.observableArrayList(linkedList);
-                    idColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getIdProperty().getValue().toString()));
-                    nameColumn.setCellValueFactory(data -> data.getValue().getNameProperty());
-                    latitudeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCoordinatesProperty().getValue().getXProperty().getValue().toString()));
-                    longitudeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCoordinatesProperty().getValue().getYProperty().getValue().toString()));
-                    creationDateColumn.setCellValueFactory(data -> {
-                        Date creationDate = data.getValue().getCreationDateProperty().getValue();
-                        LocalDate localDate = creationDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                        return new SimpleObjectProperty<>(localDate);
-                    });
-                    priceColumn.setCellValueFactory(data -> data.getValue().getPriceProperty().asObject());
-                    typeColumn.setCellValueFactory(data -> data.getValue().getTypeProperty());
-
-                    venueNameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getVenueProperty().getValue().getName()));
-                    venueCapacityColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getVenueProperty().getValue().getCapacity()));
-                    venueTypeColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getVenueProperty().getValue().getType()));
-                    venueAddressStreetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getVenueProperty().getValue().getAddress().getStreet()));
-                    venueAddressZipCodeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getVenueProperty().getValue().getAddress().getZipCode()));
-                    venueAddressTownXColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getVenueProperty().getValue().getAddress().getTown().getX()));
-                    venueAddressTownYColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getVenueProperty().getValue().getAddress().getTown().getY()));
-                    venueAddressTownNameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getVenueProperty().getValue().getAddress().getTown().getName()));
-
-                    creatorColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getUsername()));
-                    tableView.setItems(tickets);
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
+                });
             }
         }, 10, 5000);
     }
 
     private HBox getBox(Stage primaryStage, Scene nextScene) {
         Button englishButton = new Button("English");
-        englishButton.setOnAction(event -> changeLocale(Locale.forLanguageTag("en_UK"), primaryStage, nextScene));
+        englishButton.setOnAction(event -> changeLocale(new Locale("en_UK"), primaryStage, nextScene));
 
         Button russianButton = new Button("Русский");
         russianButton.setOnAction(event -> changeLocale(new Locale("ru_RU"), primaryStage, nextScene));
 
-        Button daButton = new Button("Suomalainen");
-        daButton.setOnAction(event -> changeLocale(new Locale("fi_FI"), primaryStage, nextScene));
+        Button fiButton = new Button("Suomalainen");
+        fiButton.setOnAction(event -> changeLocale(new Locale("fi_FI"), primaryStage, nextScene));
 
-        Button nlButton = new Button("Shqiptare");
-        nlButton.setOnAction(event -> changeLocale(new Locale("sq_AL"), primaryStage, nextScene));
+        Button alButton = new Button("Shqiptare");
+        alButton.setOnAction(event -> changeLocale(new Locale("sq_AL"), primaryStage, nextScene));
 
-        HBox buttonBox = new HBox(10, englishButton, russianButton, daButton, nlButton);
+        HBox buttonBox = new HBox(10, englishButton, russianButton, fiButton, alButton);
         buttonBox.setPadding(new Insets(10));
         buttonBox.setAlignment(Pos.CENTER_LEFT);
         return buttonBox;
@@ -210,6 +213,12 @@ public class TableController {
             root = loader.load();
             Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             Scene nextScene = new Scene(root);
+
+            HBox buttonBox = getBox(primaryStage, nextScene);
+
+            if (root instanceof Pane) {
+                ((Pane) root).getChildren().addAll(buttonBox);
+            }
             primaryStage.setScene(nextScene);
             primaryStage.show();
         } catch (IOException e) {

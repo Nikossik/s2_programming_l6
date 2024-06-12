@@ -2,16 +2,16 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/lab8.iml" filepath="$PROJECT_DIR$/.idea/modules/lab8.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/client/lab8.client.iml" filepath="$PROJECT_DIR$/.idea/modules/client/lab8.client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/clientTest/lab8.clientTest.iml" filepath="$PROJECT_DIR$/.idea/modules/clientTest/lab8.clientTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/clientTest/lab8.clientTest.main.iml" filepath="$PROJECT_DIR$/.idea/modules/clientTest/lab8.clientTest.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/clientTest/lab8.clientTest.test.iml" filepath="$PROJECT_DIR$/.idea/modules/clientTest/lab8.clientTest.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/lab8.server.iml" filepath="$PROJECT_DIR$/.idea/modules/server/lab8.server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/lab8.server.main.iml" filepath="$PROJECT_DIR$/.idea/modules/server/lab8.server.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/lab8.server.test.iml" filepath="$PROJECT_DIR$/.idea/modules/server/lab8.server.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/untitled/lab8.untitled.iml" filepath="$PROJECT_DIR$/.idea/modules/untitled/lab8.untitled.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/s2_programming_l6.iml" filepath="$PROJECT_DIR$/.idea/s2_programming_l6.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/untitled8.iml" filepath="$PROJECT_DIR$/.idea/modules/untitled8.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/client/untitled8.client.iml" filepath="$PROJECT_DIR$/.idea/modules/client/untitled8.client.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/clientTest/untitled8.clientTest.iml" filepath="$PROJECT_DIR$/.idea/modules/clientTest/untitled8.clientTest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/clientTest/untitled8.clientTest.main.iml" filepath="$PROJECT_DIR$/.idea/modules/clientTest/untitled8.clientTest.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/clientTest/untitled8.clientTest.test.iml" filepath="$PROJECT_DIR$/.idea/modules/clientTest/untitled8.clientTest.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/untitled8.server.iml" filepath="$PROJECT_DIR$/.idea/modules/server/untitled8.server.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/untitled8.server.main.iml" filepath="$PROJECT_DIR$/.idea/modules/server/untitled8.server.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/untitled8.server.test.iml" filepath="$PROJECT_DIR$/.idea/modules/server/untitled8.server.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/untitled/untitled8.untitled.iml" filepath="$PROJECT_DIR$/.idea/modules/untitled/untitled8.untitled.iml" />
     </modules>
   </component>
 </project>

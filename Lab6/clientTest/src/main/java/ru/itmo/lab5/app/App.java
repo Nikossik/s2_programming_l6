@@ -71,18 +71,18 @@ public class App extends Application {
 
     private HBox getButtonBox(Stage stage, Scene scene) {
         Button englishButton = new Button("English");
-        englishButton.setOnAction(event -> changeLocale(Locale.forLanguageTag("en_UK"), stage, scene));
+        englishButton.setOnAction(event -> changeLocale(new Locale("en_UK"), stage, scene));
 
         Button russianButton = new Button("Русский");
         russianButton.setOnAction(event -> changeLocale(new Locale("ru_RU"), stage, scene));
 
-        Button daButton = new Button("Suomalainen");
-        daButton.setOnAction(event -> changeLocale(new Locale("fi_FI"), stage, scene));
+        Button fiButton = new Button("Suomalainen");
+        fiButton.setOnAction(event -> changeLocale(new Locale("fi_FI"), stage, scene));
 
-        Button nlButton = new Button("Shqiptare");
-        nlButton.setOnAction(event -> changeLocale(new Locale("sq_AL"), stage, scene));
+        Button alButton = new Button("Shqiptare");
+        alButton.setOnAction(event -> changeLocale(new Locale("sq_AL"), stage, scene));
 
-        HBox buttonBox = new HBox(10, englishButton, russianButton, daButton, nlButton);
+        HBox buttonBox = new HBox(10, englishButton, russianButton, fiButton, alButton);
         buttonBox.setPadding(new Insets(10));
         buttonBox.setAlignment(Pos.CENTER_LEFT);
         return buttonBox;
