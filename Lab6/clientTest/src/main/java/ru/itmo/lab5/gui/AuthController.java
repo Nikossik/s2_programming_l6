@@ -81,9 +81,8 @@ public class AuthController {
         if (event.getSource() == loginButton) {
             task.setDescribe(new String[]{"login"});
             try {
-                System.out.println("Sending login task to server...");
+
                 Task responseTask = client.sendTask(task);
-                System.out.println("Received response: " + responseTask.getDescribe()[0]);
                 boolean loginSuccess = Boolean.parseBoolean(responseTask.getDescribe()[0]);
                 if (loginSuccess) {
                     showTable(event);
@@ -98,13 +97,11 @@ public class AuthController {
         if (event.getSource() == registerButton) {
             task.setDescribe(new String[]{"register"});
             try {
-                System.out.println("Sending register task to server...");
                 Task responseTask = client.sendTask(task);
-                System.out.println("Received response: " + responseTask.getDescribe()[0]);
                 boolean registerSuccess = Boolean.parseBoolean(responseTask.getDescribe()[0]);
                 if (registerSuccess) {
                     System.out.println("Done");
-                    //showTable(event);
+                    showTable(event);
                 } else {
                     showErrorPopupRegister();
                 }
